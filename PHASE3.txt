@@ -1,0 +1,136 @@
+PHASE-3 — USER PROFILE & ADDRESS MODULE
+Main Goal
+
+Allow a logged-in user to manage their personal information and delivery addresses.
+After this phase, a user will be able to: 1. View their profile 2. Update name & contact info 3. Change password 4. Add multiple delivery addresses 5. Select a default address 6. Edit/delete addresses
+
+What We Are Actually Building
+We are creating a Customer Account System.Think about Amazon:
+When you click “Your Account” you can:
+Edit profile, Add addresses, Manage delivery details, That entire functionality = Phase-3.
+
+Why This Phase Is Critical
+Later, when user clicks Place Order, the system must know:
+Who ordered?Where to ship? Which phone number? Which default address?
+Payment gateways and shipping APIs require these fields.
+So Phase-3 prepares order-ready user data.
+
+FEATURES INCLUDED IN PHASE-3
+We are implementing ALL of these:
+Profile: View profile page, Update name, Update phone, Update basic info
+Password: Change password securely, Verify old password, 
+Address Book: Add new address, Edit address, Delete address, Set default address, Multiple addresses support
+Security: Only owner can edit, Validation on input, Protected routes
+
+DATABASE CHANGES (FIRST REAL ECOMMERCE TABLES)
+Now we finally create new tables.
+1️⃣ user_profiles (optional depending design)
+Stores extended information: 1.phone number 2.optional metadata
+
+2️⃣ addresses (VERY IMPORTANT)
+This is one of the most important tables in the entire project.
+Each user can have many addresses.
+Fields will conceptually include:
+id, user_id, full_name, phone, address_line_1, address_line_2, city, state, postal_code, country, is_default, created_at
+Key idea:A user does NOT have one address. A user has a list of addresses.
+This is how checkout later works.
+
+We now activate: User Module -> Located at: app/Modules/User
+
+Layer Responsibilities
+Controller
+Handles: profile page,address page,form submissions
+No business logic.
+
+Request Validation
+Validates:
+phone number format
+required fields
+postal code
+address completeness
+Prevents bad delivery data.
+
+Service (Brain)
+Handles rules like:
+updating profile, verifying old password, ensuring only one default address, preventing deletion of last default address
+This is very important logic.
+
+Repository
+Handles:fetching addresses, saving address, updating address, deleting address, Only layer that talks to database.
+
+Models
+We will now actually use relationships.
+Example relationships:
+User hasMany Addresses
+Address belongsTo User
+This becomes critical for orders later.
+
+ROUTES WE WILL CREATE : All routes protected by authentication.
+Examples:
+Route	Purpose
+/profile	view profile
+/profile/edit	update profile
+/profile/password	change password
+/addresses	list addresses
+/addresses/create	add address
+/addresses/{id}/edit	edit address
+/addresses/{id}/delete	remove address
+
+Important:
+Guest users must never access these.
+We will use auth middleware.
+
+PASSWORD CHANGE FLOW
+This must be secure.
+Process:
+User enters current password
+→ verify using Hash::check
+→ if correct → update to new hashed password
+→ logout all sessions (optional best practice)
+
+ADDRESS LOGIC (VERY IMPORTANT)
+This part seems simple but actually tricky.
+We must enforce:
+Each user may have multiple addresses
+Only ONE address can be default
+Default address used during checkout
+Cannot accidentally delete only default address
+Your Service layer handles this.
+
+FRONTEND PAGES (BLADE)
+We will create:
+profile.blade.php
+edit-profile.blade.php
+change-password.blade.php
+address-list.blade.php
+address-create.blade.php
+address-edit.blade.php
+
+SECURITY RULES IN PHASE-3
+We must ensure:
+User can only edit THEIR data
+User cannot access another user’s address via URL
+Proper validation on every form
+Password confirmation required for sensitive changes
+Example attack to prevent:
+/addresses/5/edit
+User should not edit address id=5 if it belongs to someone else.
+We check using:
+user_id
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
