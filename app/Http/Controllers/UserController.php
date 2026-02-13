@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+
 class UserController extends Controller
 {
-    public function getUser()
-    {
-        return 'Hello Aadya';
+    function getUser(){
+        return "Hello Aadya";
     }
-
-    public function aboutAadya()
-    {
-        return 'She has a boyfriend named anshuman';
+    function aboutAadya(){
+        return "She has a boyfriend named anshuman";
     }
 }
