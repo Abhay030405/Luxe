@@ -1,6 +1,4 @@
-<<<<<<< HEAD
 @extends('layouts.app')
-
 @section('title', 'Home - Premium Fashion Store')
 
 @section('content')
@@ -338,6 +336,3 @@
     </div>
 </div>
 @endsection
-=======
-<h1>Hello Lareval</h1>
->>>>>>> d7ba4bcab02cf90f68fc78d63acfc6807d81ac96
