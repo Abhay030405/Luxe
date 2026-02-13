@@ -31,7 +31,7 @@
             <x-checkbox label="Remember me" />
 
             <!-- Forgot Password -->
-            <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-500 transition">
+            <a href="#" class="text-sm font-medium text-slate-600 hover:text-slate-900 hover:underline transition">
                 Forgot password?
             </a>
         </div>
@@ -44,7 +44,7 @@
         <!-- Register Link -->
         <p class="text-center text-sm text-gray-600">
             Don't have an account?
-            <a href="{{ route('register') }}" class="font-medium text-blue-600 hover:text-blue-500 transition">
+            <a href="{{ route('register') }}" class="font-medium text-slate-900 hover:underline transition">
                 Create one now
             </a>
         </p>

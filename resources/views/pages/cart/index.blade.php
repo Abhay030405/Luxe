@@ -3,19 +3,45 @@
 @section('title', 'Shopping Cart')
 
 @section('content')
-<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
     <h1 class="text-3xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
 
+    @if($cart->totalItems > 0)
     <div class="lg:grid lg:grid-cols-12 lg:gap-8">
         <!-- Cart Items -->
         <div class="lg:col-span-8">
+            @if(count($validationIssues) > 0)
+            <div class="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div class="flex items-start">
+                    <svg class="h-5 w-5 text-yellow-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                    </svg>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-yellow-800">Cart Validation Issues</h3>
+                        <ul class="mt-2 text-sm text-yellow-700 list-disc list-inside space-y-1">
+                            @foreach($validationIssues as $issue)
+                            <li>{{ $issue['product_name'] }}: {{ $issue['issue'] }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             <x-card padding="false">
-                <!-- Cart Item 1 -->
-                @for($i = 1; $i <= 3; $i++)
+                @foreach($cart->items as $item)
                 <div class="flex items-center p-6 border-b border-gray-200 last:border-b-0">
                     <!-- Product Image -->
                     <div class="h-24 w-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-200">
-                        <div class="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100"></div>
+                        @if($item->primaryImageUrl)
+                        <img src="{{ $item->primaryImageUrl }}" alt="{{ $item->productName }}" class="w-full h-full object-cover">
+                        @else
+                        <div class="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+                            <svg class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                            </svg>
+                        </div>
+                        @endif
                     </div>
 
                     <!-- Product Details -->
@@ -23,54 +49,86 @@
                         <div class="flex items-start justify-between">
                             <div>
                                 <h3 class="text-base font-semibold text-gray-900">
-                                    Product Name {{ $i }}
+                                    <a href="{{ route('products.show', $item->productSlug) }}" class="hover:text-blue-600">
+                                        {{ $item->productName }}
+                                    </a>
                                 </h3>
-                                <p class="mt-1 text-sm text-gray-500">Color: Black, Size: M</p>
-                                <p class="mt-1 text-sm text-gray-500">SKU: PRD-{{ rand(1000, 9999) }}</p>
+                                @if($item->categoryName)
+                                <p class="mt-1 text-sm text-gray-500">Category: {{ $item->categoryName }}</p>
+                                @endif
+                                @if(!$item->isInStock)
+                                <p class="mt-1 text-sm text-red-600 font-medium">Out of Stock</p>
+                                @elseif($item->quantity > $item->availableStock)
+                                <p class="mt-1 text-sm text-yellow-600 font-medium">Only {{ $item->availableStock }} available</p>
+                                @endif
                             </div>
-                            <button class="text-gray-400 hover:text-red-600 transition">
-                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                </svg>
-                            </button>
+                            <form action="{{ route('cart.destroy', $item->id) }}" method="POST" class="inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-gray-400 hover:text-red-600 transition" onclick="return confirm('Remove this item from cart?')">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                    </svg>
+                                </button>
+                            </form>
                         </div>
 
                         <!-- Quantity & Price -->
                         <div class="mt-4 flex items-center justify-between">
                             <!-- Quantity Selector -->
-                            <div class="flex items-center border border-gray-300 rounded-lg">
-                                <button class="px-3 py-1 text-gray-600 hover:bg-gray-50 transition">
-                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" />
-                                    </svg>
-                                </button>
-                                <input type="number" value="{{ rand(1, 3) }}" min="1" class="w-12 text-center border-0 focus:ring-0 text-sm font-medium">
-                                <button class="px-3 py-1 text-gray-600 hover:bg-gray-50 transition">
-                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                    </svg>
-                                </button>
-                            </div>
+                            <form action="{{ route('cart.update', $item->id) }}" method="POST" class="flex items-center">
+                                @csrf
+                                @method('PUT')
+                                <div class="flex items-center border border-gray-300 rounded-lg">
+                                    <button type="button" 
+                                            onclick="this.parentNode.querySelector('input[name=quantity]').stepDown(); this.form.submit()"
+                                            class="px-3 py-1 text-gray-600 hover:bg-gray-50 transition {{ $item->quantity <= 1 ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                            {{ $item->quantity <= 1 ? 'disabled' : '' }}>
+                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" />
+                                        </svg>
+                                    </button>
+                                    <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" max="{{ $item->availableStock }}" 
+                                           class="w-12 text-center border-0 focus:ring-0 text-sm font-medium"
+                                           onchange="this.form.submit()">
+                                    <button type="button" 
+                                            onclick="this.parentNode.querySelector('input[name=quantity]').stepUp(); this.form.submit()"
+                                            class="px-3 py-1 text-gray-600 hover:bg-gray-50 transition"
+                                            @if($item->quantity >= $item->availableStock) disabled class="opacity-50" @endif>
+                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </form>
 
                             <!-- Price -->
                             <div class="text-right">
-                                <p class="text-lg font-bold text-gray-900">${{ $price = rand(50, 200) }}.99</p>
-                                <p class="text-sm text-gray-500">Unit: ${{ $price }}.99</p>
+                                <p class="text-lg font-bold text-gray-900">${{ number_format($item->subtotal, 2) }}</p>
+                                <p class="text-sm text-gray-500">Unit: ${{ number_format($item->priceAtTime, 2) }}</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                @endfor
+                @endforeach
             </x-card>
 
-            <!-- Continue Shopping -->
-            <div class="mt-6">
-                <x-link href="/products">
+            <!-- Continue Shopping & Clear Cart -->
+            <div class="mt-6 flex items-center justify-between">
+                <x-link href="{{ route('products.index') }}">
                     <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                     </svg>
                     Continue Shopping
                 </x-link>
+
+                <form action="{{ route('cart.clear') }}" method="POST" class="inline">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="text-sm text-red-600 hover:text-red-700 font-medium" onclick="return confirm('Clear entire cart?')">
+                        Clear Cart
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -79,38 +137,32 @@
             <x-card title="Order Summary">
                 <div class="space-y-4">
                     <div class="flex items-center justify-between text-sm">
-                        <span class="text-gray-600">Subtotal (3 items)</span>
-                        <span class="font-medium text-gray-900">$359.97</span>
+                        <span class="text-gray-600">Subtotal ({{ $cart->totalItems }} items)</span>
+                        <span class="font-medium text-gray-900">${{ number_format($cart->grandTotal, 2) }}</span>
                     </div>
                     <div class="flex items-center justify-between text-sm">
-                        <span class="text-gray-600">Shipping</span>
-                        <span class="font-medium text-gray-900">$15.00</span>
-                    </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-gray-600">Tax</span>
-                        <span class="font-medium text-gray-900">$37.50</span>
-                    </div>
-
-                    <!-- Discount Code -->
-                    <div class="pt-4 border-t border-gray-200">
-                        <div class="flex space-x-2">
-                            <input type="text" placeholder="Discount code" class="flex-1 rounded-lg border-gray-300 text-sm focus:border-blue-600 focus:ring-blue-600">
-                            <x-button variant="outline" size="sm">Apply</x-button>
-                        </div>
+                        <span class="text-gray-600">Total Quantity</span>
+                        <span class="font-medium text-gray-900">{{ $cart->totalQuantity }} items</span>
                     </div>
 
                     <!-- Total -->
                     <div class="pt-4 border-t border-gray-200">
                         <div class="flex items-center justify-between">
                             <span class="text-base font-semibold text-gray-900">Total</span>
-                            <span class="text-2xl font-bold text-gray-900">$412.47</span>
+                            <span class="text-2xl font-bold text-gray-900">${{ number_format($cart->grandTotal, 2) }}</span>
                         </div>
                     </div>
 
                     <!-- Checkout Button -->
-                    <x-button variant="primary" class="w-full" size="lg">
+                    @if(count($validationIssues) > 0)
+                    <button disabled class="w-full py-3 px-4 text-base font-medium text-white bg-gray-400 rounded-lg cursor-not-allowed">
+                        Fix Issues to Proceed
+                    </button>
+                    @else
+                    <x-button variant="primary" class="w-full" size="lg" href="{{ route('checkout.index') }}">
                         Proceed to Checkout
                     </x-button>
+                    @endif
 
                     <!-- Security Badge -->
                     <div class="flex items-center justify-center text-sm text-gray-500 pt-4">
@@ -134,17 +186,20 @@
             </x-card>
         </div>
     </div>
-
-    <!-- Empty Cart State (Hidden when cart has items) -->
-    {{-- <x-empty-state 
-        title="Your cart is empty"
-        description="Looks like you haven't added anything to your cart yet. Start shopping to fill it up!"
-        icon="cart">
-        <x-slot:action>
-            <x-button variant="primary" href="/products">
+    @else
+    <!-- Empty Cart State -->
+    <div class="text-center py-16">
+        <svg class="mx-auto h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+        </svg>
+        <h2 class="mt-6 text-2xl font-bold text-gray-900">Your cart is empty</h2>
+        <p class="mt-2 text-gray-600">Looks like you haven't added anything to your cart yet.</p>
+        <div class="mt-8">
+            <x-button variant="primary" href="{{ route('products.index') }}">
                 Browse Products
             </x-button>
-        </x-slot:action>
-    </x-empty-state> --}}
+        </div>
+    </div>
+    @endif
 </div>
 @endsection

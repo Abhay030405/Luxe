@@ -56,7 +56,12 @@ class AuthController extends Controller
             (bool) ($validated['remember'] ?? false)
         );
 
-        return redirect()->intended(route('dashboard'))
+        // Redirect based on user role
+        $intendedRoute = auth()->user()->is_admin
+            ? route('admin.dashboard')
+            : route('dashboard');
+
+        return redirect()->intended($intendedRoute)
             ->with('success', 'Welcome back!');
     }
 

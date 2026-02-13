@@ -87,32 +87,53 @@
             <!-- Quantity Selector -->
             <div class="mb-6">
                 <label class="block text-sm font-medium text-gray-900 mb-2">Quantity</label>
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center border border-gray-300 rounded-lg">
-                        <button class="px-4 py-2 text-gray-600 hover:bg-gray-50 transition">
-                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" />
-                            </svg>
-                        </button>
-                        <input type="number" value="1" min="1" class="w-16 text-center border-0 focus:ring-0 text-gray-900 font-medium">
-                        <button class="px-4 py-2 text-gray-600 hover:bg-gray-50 transition">
-                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                            </svg>
-                        </button>
+                <form action="{{ route('cart.store') }}" method="POST" id="addToCartForm">
+                    @csrf
+                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center border border-gray-300 rounded-lg">
+                            <button type="button" onclick="decreaseQuantity()" class="px-4 py-2 text-gray-600 hover:bg-gray-50 transition">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" />
+                                </svg>
+                            </button>
+                            <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ $product->stockQuantity }}" class="w-16 text-center border-0 focus:ring-0 text-gray-900 font-medium">
+                            <button type="button" onclick="increaseQuantity()" class="px-4 py-2 text-gray-600 hover:bg-gray-50 transition">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
+                            </button>
+                        </div>
+                        @if($product->stockQuantity > 0)
+                        <span class="text-sm text-gray-600">Only {{ $product->stockQuantity }} items left in stock</span>
+                        @else
+                        <span class="text-sm text-red-600 font-medium">Out of Stock</span>
+                        @endif
                     </div>
-                    <span class="text-sm text-gray-600">Only 12 items left in stock</span>
-                </div>
+                </form>
             </div>
 
             <!-- Action Buttons -->
             <div class="flex space-x-4 mb-6">
-                <x-button variant="primary" class="flex-1" size="lg">
-                    <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
-                    </svg>
-                    Add to Cart
-                </x-button>
+                @auth
+                    @if($product->isInStock)
+                    <button form="addToCartForm" type="submit" class="flex-1 inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                        </svg>
+                        Add to Cart
+                    </button>
+                    @else
+                    <button disabled class="flex-1 inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-gray-400 rounded-lg cursor-not-allowed">
+                        Out of Stock
+                    </button>
+                    @endif
+                @else
+                <a href="{{ route('login') }}" class="flex-1 inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition">
+                    Login to Add to Cart
+                </a>
+                @endauth
                 <x-button variant="outline" size="lg">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
@@ -120,7 +141,28 @@
                 </x-button>
             </div>
 
+            @if($product->isInStock)
             <x-button variant="success" class="w-full" size="lg">Buy Now</x-button>
+            @endif
+
+            <script>
+                function increaseQuantity() {
+                    const input = document.getElementById('quantity');
+                    const max = parseInt(input.max);
+                    const current = parseInt(input.value);
+                    if (current < max) {
+                        input.value = current + 1;
+                    }
+                }
+                
+                function decreaseQuantity() {
+                    const input = document.getElementById('quantity');
+                    const current = parseInt(input.value);
+                    if (current > 1) {
+                        input.value = current - 1;
+                    }
+                }
+            </script>
 
             <!-- Additional Info -->
             <div class="mt-8 space-y-4">

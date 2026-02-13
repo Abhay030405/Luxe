@@ -9,7 +9,7 @@
     <div class="lg:grid lg:grid-cols-12 lg:gap-8">
         <!-- Sidebar Navigation -->
         <aside class="lg:col-span-3">
-            <nav class="space-y-1 sticky top-4" x-data="{ active: 'account' }">
+            <nav class="space-y-1 sticky top-4" x-data="{ active: '{{ request('tab', 'account') }}' }">
                 <button @click="active = 'account'" :class="active === 'account' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50'" class="w-full flex items-center px-4 py-3 rounded-lg font-medium text-sm transition">
                     <svg class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
@@ -49,7 +49,7 @@
         </aside>
 
         <!-- Content Area -->
-        <div class="mt-8 lg:mt-0 lg:col-span-9" x-data="{ active: 'account' }">
+        <div class="mt-8 lg:mt-0 lg:col-span-9" x-data="{ active: '{{ request('tab', 'account') }}' }">
             <!-- Account Details -->
             <div x-show="active === 'account'">
                 <x-card title="Account Details">

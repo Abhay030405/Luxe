@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Modules\Auth\Repositories\Contracts\UserRepositoryInterface;
 use App\Modules\Auth\Repositories\UserRepository;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,6 +24,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Paginator::useTailwind();
+
+        // Share cart count with all views
+        View::composer('*', \App\Http\View\Composers\CartComposer::class);
     }
 }

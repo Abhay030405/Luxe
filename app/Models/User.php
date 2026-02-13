@@ -23,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_admin',
     ];
 
     /**
@@ -45,6 +46,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
         ];
     }
 
@@ -70,5 +72,21 @@ class User extends Authenticatable
     public function defaultAddress(): HasOne
     {
         return $this->hasOne(Address::class)->where('is_default', true);
+    }
+
+    /**
+     * Get all cart items for the user.
+     */
+    public function cartItems(): HasMany
+    {
+        return $this->hasMany(\App\Modules\Cart\Models\CartItem::class);
+    }
+
+    /**
+     * Get all orders for the user.
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(\App\Modules\Order\Models\Order::class);
     }
 }
