@@ -58,7 +58,7 @@ class CheckoutController extends Controller
             ->get();
 
         if ($addresses->isEmpty()) {
-            return redirect()->route('addresses.create')
+            return redirect()->route('addresses.create', ['redirect_to' => 'checkout'])
                 ->with('info', 'Please add a delivery address before checkout.');
         }
 

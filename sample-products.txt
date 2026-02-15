@@ -1,0 +1,143 @@
+========================================
+SAMPLE FASHION PRODUCTS FOR ADMIN PANEL
+========================================
+
+PRODUCT 1: Men's Classic Denim Jacket
+-------------------------------------
+Name: Classic Denim Jacket - Men
+Category: Men > Jackets
+SKU: MJ-DN-001
+Barcode: 8901234567890
+Description: Premium quality denim jacket with a classic fit. Features button closure, chest pockets, and adjustable waist tabs. Perfect for casual outings and layering. Made from 100% cotton denim fabric.
+Price: 89.99
+Sale Price: 69.99
+Stock Quantity: 50
+Low Stock Threshold: 10
+Status: Active
+Is Featured: Yes
+Weight: 0.80 kg
+Length: 35 cm
+Width: 28 cm
+Height: 5 cm
+
+
+PRODUCT 2: Women's Floral Summer Dress
+-------------------------------------
+Name: Floral Midi Dress - Women
+Category: Women > Dresses
+SKU: WD-FL-002
+Barcode: 8901234567891
+Description: Beautiful floral print midi dress perfect for summer occasions. Features a flattering v-neck, short sleeves, and a flowing A-line silhouette. Made from lightweight, breathable fabric with an elastic waistband for comfort.
+Price: 79.99
+Sale Price: (leave empty - no sale)
+Stock Quantity: 35
+Low Stock Threshold: 8
+Status: Active
+Is Featured: Yes
+Weight: 0.35 kg
+Length: 30 cm
+Width: 25 cm
+Height: 3 cm
+
+
+PRODUCT 3: Men's Running Sneakers
+-------------------------------------
+Name: Performance Running Sneakers - Men
+Category: Men > Sneakers
+SKU: MS-RN-003
+Barcode: 8901234567892
+Description: High-performance running sneakers with advanced cushioning technology. Features breathable mesh upper, lightweight EVA midsole, and durable rubber outsole. Ideal for running, gym workouts, and everyday wear.
+Price: 129.99
+Sale Price: 99.99
+Stock Quantity: 45
+Low Stock Threshold: 12
+Status: Active
+Is Featured: Yes
+Weight: 0.60 kg
+Length: 32 cm
+Width: 20 cm
+Height: 12 cm
+
+
+PRODUCT 4: Women's Leather Handbag
+-------------------------------------
+Name: Classic Leather Tote Bag - Women
+Category: Women > Handbags
+SKU: WB-LT-004
+Barcode: 8901234567893
+Description: Elegant genuine leather tote bag with spacious interior. Features multiple compartments, zippered closure, and comfortable shoulder straps. Perfect for work, shopping, or everyday use. Available in timeless brown color.
+Price: 149.99
+Sale Price: (leave empty - no sale)
+Stock Quantity: 25
+Low Stock Threshold: 5
+Status: Active
+Is Featured: No
+Weight: 0.95 kg
+Length: 40 cm
+Width: 35 cm
+Height: 15 cm
+
+
+PRODUCT 5: Men's Slim Fit Chinos
+-------------------------------------
+Name: Slim Fit Chino Pants - Men
+Category: Men > Trousers
+SKU: MT-CH-005
+Barcode: 8901234567894
+Description: Modern slim fit chino pants crafted from premium cotton blend. Features a flat front design, belt loops, and side pockets. Versatile pants suitable for both casual and semi-formal occasions. Wrinkle-resistant and easy to care for.
+Price: 59.99
+Sale Price: 44.99
+Stock Quantity: 60
+Low Stock Threshold: 15
+Status: Active
+Is Featured: No
+Weight: 0.45 kg
+Length: 35 cm
+Width: 30 cm
+Height: 4 cm
+
+
+PRODUCT 6: Women's High Heel Pumps
+-------------------------------------
+Name: Classic Pointed Toe Heels - Women
+Category: Women > Heels
+SKU: WH-PT-006
+Barcode: 8901234567895
+Description: Sophisticated pointed toe pumps with 3-inch heel height. Made from high-quality synthetic leather with cushioned insole for all-day comfort. Perfect for office wear, parties, and special occasions. Features slip-resistant outsole.
+Price: 89.99
+Sale Price: 74.99
+Stock Quantity: 30
+Low Stock Threshold: 8
+Status: Active
+Is Featured: Yes
+Weight: 0.55 kg
+Length: 28 cm
+Width: 22 cm
+Height: 10 cm
+
+
+========================================
+NOTES:
+========================================
+1. All prices are in USD
+2. Sale Price: Leave empty if no discount
+3. Status options: Active, Draft, Inactive
+4. Is Featured: Yes/No (featured products appear on homepage)
+5. Stock Quantity: Number of units available
+6. Low Stock Threshold: Alert when stock falls below this number
+7. Dimensions are for shipping calculations
+8. You can add product images after creating the product
+9. SKU must be unique for each product
+10. Barcode is optional but recommended for inventory management
+
+========================================
+QUICK START GUIDE:
+========================================
+1. Login to admin panel: http://localhost:8000/admin
+2. Click "Add New Product" or go to Products > Add New
+3. Fill in the product details from above
+4. Save the product
+5. After saving, you can upload product images
+6. Repeat for all 6 products
+
+Enjoy setting up your fashion store! 🎉

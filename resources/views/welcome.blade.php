@@ -43,16 +43,16 @@
             <p class="mt-4 text-lg text-gray-600">Find exactly what you're looking for</p>
         </div>
 
-        <div class="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+        <div class="grid grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-2 max-w-5xl mx-auto">
             @foreach($categories as $category)
             <a href="{{ route('products.index', ['category' => $category->slug]) }}" 
-               class="group relative overflow-hidden rounded-2xl aspect-square bg-gray-100 hover:shadow-xl transition">
+               class="group relative overflow-hidden rounded-2xl bg-gray-100 hover:shadow-2xl transition" style="height: 400px;">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=600&h=600&fit=crop" 
+                <img src="{{ asset('images/' . (strtolower($category->name) === 'men' ? 'men.png' : (strtolower($category->name) === 'women' ? 'women.png' : 'default.png'))) }}" 
                      alt="{{ $category->name }}" 
                      class="h-full w-full object-cover group-hover:scale-110 transition duration-500">
-                <div class="absolute inset-0 flex items-end p-6">
-                    <h3 class="text-xl sm:text-2xl font-bold text-white">{{ $category->name }}</h3>
+                <div class="absolute inset-0 flex items-end p-8">
+                    <h3 class="text-2xl sm:text-3xl font-bold text-white">{{ $category->name }}</h3>
                 </div>
             </a>
             @endforeach
@@ -96,8 +96,8 @@
             <div class="group">
                 <a href="{{ route('products.show', $product->slug) }}">
                     <div class="aspect-square overflow-hidden rounded-lg bg-gray-100 mb-4">
-                        @if($product->primaryImage)
-                            <img src="{{ asset('storage/' . $product->primaryImage->image_path) }}" 
+                        @if($product->primaryImageUrl)
+                            <img src="{{ $product->primaryImageUrl }}" 
                                  alt="{{ $product->name }}" 
                                  class="h-full w-full object-cover group-hover:scale-110 transition duration-500">
                         @else
@@ -112,11 +112,11 @@
                         {{ $product->name }}
                     </h3>
                     <div class="flex items-center gap-2">
-                        @if($product->sale_price)
-                            <p class="text-lg font-bold text-gray-900">${{ number_format($product->sale_price, 2) }}</p>
-                            <p class="text-sm text-gray-500 line-through">${{ number_format($product->price, 2) }}</p>
+                        @if($product->salePrice)
+                            <p class="text-lg font-bold text-gray-900">{{ currency($product->salePrice) }}</p>
+                            <p class="text-sm text-gray-500 line-through">{{ currency($product->price) }}</p>
                         @else
-                            <p class="text-lg font-bold text-gray-900">${{ number_format($product->price, 2) }}</p>
+                            <p class="text-lg font-bold text-gray-900">{{ currency($product->price) }}</p>
                         @endif
                     </div>
                 </a>
@@ -154,8 +154,8 @@
                         <span class="absolute top-2 right-2 z-10 rounded-full bg-black/80 px-3 py-1 text-xs font-semibold text-white">
                             Featured
                         </span>
-                        @if($product->primaryImage)
-                            <img src="{{ asset('storage/' . $product->primaryImage->image_path) }}" 
+                        @if($product->primaryImageUrl)
+                            <img src="{{ $product->primaryImageUrl }}" 
                                  alt="{{ $product->name }}" 
                                  class="h-full w-full object-cover group-hover:scale-110 transition duration-500">
                         @else
@@ -170,11 +170,11 @@
                         {{ $product->name }}
                     </h3>
                     <div class="flex items-center gap-2">
-                        @if($product->sale_price)
-                            <p class="text-lg font-bold text-gray-900">${{ number_format($product->sale_price, 2) }}</p>
-                            <p class="text-sm text-gray-500 line-through">${{ number_format($product->price, 2) }}</p>
+                        @if($product->salePrice)
+                            <p class="text-lg font-bold text-gray-900">{{ currency($product->salePrice) }}</p>
+                            <p class="text-sm text-gray-500 line-through">{{ currency($product->price) }}</p>
                         @else
-                            <p class="text-lg font-bold text-gray-900">${{ number_format($product->price, 2) }}</p>
+                            <p class="text-lg font-bold text-gray-900">{{ currency($product->price) }}</p>
                         @endif
                     </div>
                 </a>

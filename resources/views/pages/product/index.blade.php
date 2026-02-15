@@ -20,10 +20,12 @@
         </button>
     </div>
 
-    <form action="{{ route('products.index') }}" method="GET" id="filter-form">
-        <div class="lg:grid lg:grid-cols-4 lg:gap-8">
-            <!-- Filters Sidebar -->
-            <aside class="hidden lg:block space-y-6">
+    <div class="lg:grid lg:grid-cols-4 lg:gap-8">
+        <!-- Filters Sidebar -->
+        <aside class="hidden lg:block space-y-6">
+            <form action="{{ route('products.index') }}" method="GET" id="filter-form">
+                <!-- Hidden input to preserve sort_by when filters change -->
+                <input type="hidden" name="sort_by" id="filter-sort-by" value="{{ $filters['sort_by'] ?? 'created_at' }}">
                 
                 <!-- Categories Filter -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
@@ -69,7 +71,7 @@
                                 <label class="block text-xs font-medium text-gray-500 mb-1">Min</label>
                                 <div class="relative rounded-md shadow-sm">
                                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <span class="text-gray-500 sm:text-sm">$</span>
+                                        <span class="text-gray-500 sm:text-sm">{{ currency_symbol() }}</span>
                                     </div>
                                     <input 
                                         type="number" 
@@ -84,7 +86,7 @@
                                 <label class="block text-xs font-medium text-gray-500 mb-1">Max</label>
                                 <div class="relative rounded-md shadow-sm">
                                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <span class="text-gray-500 sm:text-sm">$</span>
+                                        <span class="text-gray-500 sm:text-sm">{{ currency_symbol() }}</span>
                                     </div>
                                     <input 
                                         type="number" 
@@ -125,6 +127,7 @@
                         Clear all filters
                     </a>
                 </div>
+            </form>
             </aside>
 
             <!-- Products Grid -->
@@ -132,8 +135,8 @@
                 <!-- Sorting Bar -->
                 <div class="flex justify-end mb-6">
                     <select 
-                        name="sort_by" 
-                        onchange="document.getElementById('filter-form').submit()" 
+                        name="sort_by"
+                        onchange="document.getElementById('filter-sort-by').value = this.value; document.getElementById('filter-form').submit();"
                         class="rounded-lg border-gray-300 text-sm focus:border-slate-900 focus:ring-slate-900 py-2 pl-3 pr-10"
                     >
                         <option value="created_at" {{ ($filters['sort_by'] ?? 'created_at') == 'created_at' ? 'selected' : '' }}>Newest Arrivals</option>
@@ -176,23 +179,6 @@
                                     </span>
                                 </div>
                             @endif
-
-                            <!-- Quick Action Overlay (Desktop) -->
-                            <div class="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 hidden md:block">
-                                <form action="{{ route('cart.store') }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                    <input type="hidden" name="quantity" value="1">
-                                    @if($product->isInStock)
-                                    <button type="submit" class="w-full bg-slate-900 text-white py-2 rounded-lg font-medium text-sm shadow-lg hover:bg-slate-800 flex items-center justify-center space-x-2">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                                        </svg>
-                                        <span>Add to Cart</span>
-                                    </button>
-                                    @endif
-                                </form>
-                            </div>
                         </a>
 
                         <!-- Product Info -->
@@ -205,30 +191,39 @@
                             </a>
 
                             <!-- Price -->
-                            <div class="flex items-end justify-between">
-                                <div>
-                                    @if($product->isOnSale)
-                                        <span class="text-lg font-bold text-slate-900">${{ number_format($product->salePrice, 2) }}</span>
-                                        <span class="ml-2 text-xs font-medium text-gray-400 line-through">${{ number_format($product->price, 2) }}</span>
-                                    @else
-                                        <span class="text-lg font-bold text-slate-900">${{ number_format($product->price, 2) }}</span>
-                                    @endif
-                                </div>
-                                
-                                <!-- Mobile Add to Cart (Visible only on touch/small screens or if you prefer always visible) -->
-                                <div class="md:hidden">
-                                     <form action="{{ route('cart.store') }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                        <input type="hidden" name="quantity" value="1">
-                                        <button type="submit" class="p-2 rounded-full bg-gray-100 text-slate-900 hover:bg-slate-900 hover:text-white transition-colors" {{ !$product->isInStock ? 'disabled' : '' }}>
-                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <div class="mb-3">
+                                @if($product->isOnSale)
+                                    <span class="text-lg font-bold text-slate-900">{{ currency($product->salePrice) }}</span>
+                                    <span class="ml-2 text-xs font-medium text-gray-400 line-through">{{ currency($product->price) }}</span>
+                                @else
+                                    <span class="text-lg font-bold text-slate-900">{{ currency($product->price) }}</span>
+                                @endif
+                            </div>
+                            
+                            <!-- Add to Cart Button -->
+                            @auth
+                                <form action="{{ route('cart.store') }}" method="POST" class="w-full">
+                                    @csrf
+                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                    <input type="hidden" name="quantity" value="1">
+                                    @if($product->isInStock)
+                                        <button type="submit" class="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition-colors duration-200">
+                                            <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                                             </svg>
+                                            Add to Cart
                                         </button>
-                                    </form>
-                                </div>
-                            </div>
+                                    @else
+                                        <button type="button" disabled class="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-lg cursor-not-allowed">
+                                            Out of Stock
+                                        </button>
+                                    @endif
+                                </form>
+                            @else
+                                <a href="{{ route('login') }}" class="block w-full text-center px-4 py-2 text-sm font-medium text-slate-900 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200">
+                                    Login to Add to Cart
+                                </a>
+                            @endauth
                         </div>
                     </div>
                     @endforeach
@@ -255,6 +250,5 @@
                 @endif
             </div>
         </div>
-    </form>
 </div>
 @endsection

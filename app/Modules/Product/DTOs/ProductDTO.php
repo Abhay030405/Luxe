@@ -40,7 +40,7 @@ readonly class ProductDTO
             id: $product->id,
             name: $product->name,
             slug: $product->slug,
-            categoryId: $product->category_id,
+            categoryId: (int) $product->category_id,
             categoryName: $product->category?->name ?? 'Unknown',
             description: $product->description,
             shortDescription: $product->short_description,

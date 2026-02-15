@@ -28,7 +28,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Total Revenue</p>
-                    <p class="mt-2 text-3xl font-bold text-gray-900">${{ number_format($stats['total_revenue'] ?? 0, 2) }}</p>
+                    <p class="mt-2 text-3xl font-bold text-gray-900">{{ currency($stats['total_revenue'] ?? 0) }}</p>
                     @if(($stats['total_revenue'] ?? 0) > 0)
                         <p class="mt-2 text-sm text-gray-500">From confirmed orders</p>
                     @else
@@ -142,7 +142,7 @@
                                         <div class="text-sm text-gray-500">{{ $order->user->email }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="text-sm font-semibold text-gray-900">${{ number_format($order->total_amount, 2) }}</span>
+                                        <span class="text-sm font-semibold text-gray-900">{{ currency($order->total_amount) }}</span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <x-badge :color="match($order->status->value) {

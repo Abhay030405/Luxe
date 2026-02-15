@@ -104,8 +104,8 @@
 
                             <!-- Price -->
                             <div class="text-right">
-                                <p class="text-lg font-bold text-gray-900">${{ number_format($item->subtotal, 2) }}</p>
-                                <p class="text-sm text-gray-500">Unit: ${{ number_format($item->priceAtTime, 2) }}</p>
+                                <p class="text-lg font-bold text-gray-900">{{ currency($item->subtotal) }}</p>
+                                <p class="text-sm text-gray-500">Unit: {{ currency($item->priceAtTime) }}</p>
                             </div>
                         </div>
                     </div>
@@ -138,7 +138,7 @@
                 <div class="space-y-4">
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-gray-600">Subtotal ({{ $cart->totalItems }} items)</span>
-                        <span class="font-medium text-gray-900">${{ number_format($cart->grandTotal, 2) }}</span>
+                        <span class="font-medium text-gray-900">{{ currency($cart->grandTotal) }}</span>
                     </div>
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-gray-600">Total Quantity</span>
@@ -149,7 +149,7 @@
                     <div class="pt-4 border-t border-gray-200">
                         <div class="flex items-center justify-between">
                             <span class="text-base font-semibold text-gray-900">Total</span>
-                            <span class="text-2xl font-bold text-gray-900">${{ number_format($cart->grandTotal, 2) }}</span>
+                            <span class="text-2xl font-bold text-gray-900">{{ currency($cart->grandTotal) }}</span>
                         </div>
                     </div>
 

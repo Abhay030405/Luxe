@@ -4,6 +4,18 @@
 
 @section('content')
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Checkout Notice -->
+    @if($redirectTo === 'checkout')
+        <div class="mb-6 rounded-lg bg-blue-50 p-4 border border-blue-200">
+            <div class="flex">
+                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                </svg>
+                <p class="ml-3 text-sm font-medium text-blue-800">You're adding an address for checkout. After saving, you'll be redirected to complete your order.</p>
+            </div>
+        </div>
+    @endif
+
     <!-- Header -->
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900">Add New Address</h1>
@@ -43,6 +55,11 @@
             <x-card title="Address Information">
                 <form method="POST" action="{{ route('addresses.store') }}" class="space-y-6">
                     @csrf
+
+                    <!-- Hidden field for redirect_to -->
+                    @if($redirectTo)
+                        <input type="hidden" name="redirect_to" value="{{ $redirectTo }}">
+                    @endif
 
                     <!-- Contact Info -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

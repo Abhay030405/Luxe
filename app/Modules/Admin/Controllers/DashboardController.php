@@ -44,7 +44,8 @@ class DashboardController extends Controller
             ->get();
 
         // Get low stock products
-        $lowStockProducts = Product::where('stock_quantity', '<=', 10)
+        $lowStockProducts = Product::with(['primaryImage', 'category'])
+            ->where('stock_quantity', '<=', 10)
             ->where('stock_quantity', '>', 0)
             ->orderBy('stock_quantity', 'asc')
             ->limit(10)

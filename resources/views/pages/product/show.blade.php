@@ -4,14 +4,33 @@
 
 @section('content')
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    @if($errors->any())
+        <div class="mb-6 rounded-lg bg-red-50 p-4 border border-red-200">
+            <div class="flex">
+                <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+                <div class="ml-3">
+                    @foreach($errors->all() as $error)
+                        <p class="text-sm font-medium text-red-800">{{ $error }}</p>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Breadcrumb -->
     <nav class="flex mb-8" aria-label="Breadcrumb">
         <ol class="inline-flex items-center space-x-2 text-sm">
             <li><a href="/" class="text-gray-500 hover:text-gray-700">Home</a></li>
             <li><span class="text-gray-400">/</span></li>
-            <li><a href="#" class="text-gray-500 hover:text-gray-700">Electronics</a></li>
+            <li><a href="{{ route('products.index') }}" class="text-gray-500 hover:text-gray-700">Products</a></li>
+            @if($product->categoryId)
             <li><span class="text-gray-400">/</span></li>
-            <li class="text-gray-900 font-medium">Product Name</li>
+            <li><a href="{{ route('products.index', ['category_id' => $product->categoryId]) }}" class="text-gray-500 hover:text-gray-700">{{ $product->categoryName }}</a></li>
+            @endif
+            <li><span class="text-gray-400">/</span></li>
+            <li class="text-gray-900 font-medium">{{ $product->name }}</li>
         </ol>
     </nav>
 
@@ -20,46 +39,67 @@
         <div class="space-y-4">
             <!-- Main Image -->
             <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden">
-                <div class="w-full h-96 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
-                    <svg class="h-48 w-48 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
-                    </svg>
-                </div>
+                @if($product->primaryImageUrl)
+                    <img src="{{ $product->primaryImageUrl }}" 
+                         alt="{{ $product->name }}" 
+                         class="w-full h-96 object-cover" id="mainImage">
+                @elseif($product->images && $product->images->count() > 0)
+                    <img src="{{ $product->images->first()['url'] }}" 
+                         alt="{{ $product->name }}" 
+                         class="w-full h-96 object-cover" id="mainImage">
+                @else
+                    <div class="w-full h-96 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+                        <svg class="h-48 w-48 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                        </svg>
+                    </div>
+                @endif
             </div>
 
             <!-- Thumbnail Gallery -->
+            @if($product->images && $product->images->count() > 1)
             <div class="grid grid-cols-4 gap-4">
-                @for($i = 1; $i <= 4; $i++)
-                <button class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden border-2 {{ $i == 1 ? 'border-blue-600' : 'border-transparent' }} hover:border-blue-400 transition">
-                    <div class="w-full h-24 bg-gradient-to-br from-blue-50 to-purple-50"></div>
+                @foreach($product->images->take(4) as $index => $image)
+                <button onclick="changeMainImage('{{ $image['url'] }}')" 
+                        class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden border-2 {{ $index == 0 ? 'border-blue-600' : 'border-transparent' }} hover:border-blue-400 transition">
+                    <img src="{{ $image['url'] }}" 
+                         alt="{{ $product->name }}" 
+                         class="w-full h-24 object-cover">
                 </button>
-                @endfor
+                @endforeach
             </div>
+            @endif
         </div>
 
         <!-- Product Info -->
         <div class="mt-8 lg:mt-0">
             <div class="flex items-center justify-between mb-4">
-                <x-badge color="green">In Stock</x-badge>
-                <div class="flex items-center space-x-2">
-                    <span class="text-yellow-400 text-lg">★★★★☆</span>
-                    <span class="text-sm text-gray-600">(4.5/5 from 234 reviews)</span>
-                </div>
+                @if($product->isInStock)
+                    <x-badge color="green">In Stock</x-badge>
+                @else
+                    <x-badge color="red">Out of Stock</x-badge>
+                @endif
             </div>
 
             <h1 class="text-3xl font-bold text-gray-900 mb-4">
-                Premium Wireless Headphones
+                {{ $product->name }}
             </h1>
 
+            @if($product->shortDescription)
             <p class="text-gray-600 mb-6">
-                Experience superior sound quality with our premium wireless headphones. Features active noise cancellation, 30-hour battery life, and premium comfort.
+                {{ $product->shortDescription }}
             </p>
+            @endif
 
             <!-- Price -->
             <div class="flex items-baseline space-x-4 mb-6">
-                <span class="text-4xl font-bold text-gray-900">$299.99</span>
-                <span class="text-xl text-gray-500 line-through">$399.99</span>
-                <x-badge color="red" size="lg">25% OFF</x-badge>
+                @if($product->isOnSale)
+                    <span class="text-4xl font-bold text-gray-900">{{ currency($product->salePrice) }}</span>
+                    <span class="text-xl text-gray-500 line-through">{{ currency($product->price) }}</span>
+                    <x-badge color="red" size="lg">{{ $product->discountPercentage }}% OFF</x-badge>
+                @else
+                    <span class="text-4xl font-bold text-gray-900">{{ currency($product->price) }}</span>
+                @endif
             </div>
 
             <!-- Features -->
@@ -68,19 +108,19 @@
                     <svg class="h-5 w-5 text-green-600 mr-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span class="text-gray-700">Free shipping on orders over $50</span>
+                    <span class="text-gray-700">Free shipping on orders over ₹500</span>
                 </div>
                 <div class="flex items-center text-sm">
                     <svg class="h-5 w-5 text-green-600 mr-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span class="text-gray-700">30-day money-back guarantee</span>
+                    <span class="text-gray-700">7-day return policy</span>
                 </div>
                 <div class="flex items-center text-sm">
                     <svg class="h-5 w-5 text-green-600 mr-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span class="text-gray-700">1-year warranty included</span>
+                    <span class="text-gray-700">Secure payment with COD available</span>
                 </div>
             </div>
 
@@ -195,86 +235,92 @@
                 <button @click="tab = 'description'" :class="tab === 'description' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="py-4 px-1 border-b-2 font-medium text-sm transition">
                     Description
                 </button>
+                @if($product->metaData && isset($product->metaData['specifications']))
                 <button @click="tab = 'specifications'" :class="tab === 'specifications' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="py-4 px-1 border-b-2 font-medium text-sm transition">
                     Specifications
                 </button>
-                <button @click="tab = 'reviews'" :class="tab === 'reviews' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="py-4 px-1 border-b-2 font-medium text-sm transition">
-                    Reviews (234)
-                </button>
+                @endif
             </nav>
         </div>
 
         <!-- Description Tab -->
         <div x-show="tab === 'description'" class="py-8">
             <div class="prose max-w-none">
-                <p class="text-gray-600">
-                    Experience premium audio quality with our flagship wireless headphones. Designed for audiophiles and casual listeners alike, these headphones deliver exceptional sound clarity, deep bass, and crisp highs.
-                </p>
-                <h3 class="text-lg font-semibold text-gray-900 mt-6">Key Features:</h3>
-                <ul class="space-y-2 text-gray-600">
-                    <li>• Active Noise Cancellation (ANC) for immersive listening</li>
-                    <li>• 30-hour battery life on a single charge</li>
-                    <li>• Premium memory foam ear cushions for all-day comfort</li>
-                    <li>• Bluetooth 5.0 for stable, wireless connectivity</li>
-                    <li>• Built-in microphone for hands-free calling</li>
-                    <li>• Foldable design with carrying case included</li>
-                </ul>
+                @if($product->description)
+                    <p class="text-gray-600 whitespace-pre-line">{{ $product->description }}</p>
+                @else
+                    <p class="text-gray-500 italic">No detailed description available for this product.</p>
+                @endif
             </div>
         </div>
 
         <!-- Specifications Tab -->
+        @if($product->metaData && isset($product->metaData['specifications']))
         <div x-show="tab === 'specifications'" class="py-8">
             <table class="min-w-full divide-y divide-gray-200">
                 <tbody class="divide-y divide-gray-200">
-                    <tr><td class="py-4 text-sm font-medium text-gray-900 w-1/3">Brand</td><td class="py-4 text-sm text-gray-600">Premium Audio</td></tr>
-                    <tr><td class="py-4 text-sm font-medium text-gray-900">Model</td><td class="py-4 text-sm text-gray-600">PA-2024-PRO</td></tr>
-                    <tr><td class="py-4 text-sm font-medium text-gray-900">Connectivity</td><td class="py-4 text-sm text-gray-600">Bluetooth 5.0, 3.5mm aux</td></tr>
-                    <tr><td class="py-4 text-sm font-medium text-gray-900">Battery Life</td><td class="py-4 text-sm text-gray-600">30 hours</td></tr>
-                    <tr><td class="py-4 text-sm font-medium text-gray-900">Weight</td><td class="py-4 text-sm text-gray-600">250g</td></tr>
-                    <tr><td class="py-4 text-sm font-medium text-gray-900">Warranty</td><td class="py-4 text-sm text-gray-600">1 Year</td></tr>
+                    @foreach($product->metaData['specifications'] as $key => $value)
+                    <tr>
+                        <td class="py-4 text-sm font-medium text-gray-900 w-1/3">{{ ucfirst($key) }}</td>
+                        <td class="py-4 text-sm text-gray-600">{{ $value }}</td>
+                    </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
-
-        <!-- Reviews Tab -->
-        <div x-show="tab === 'reviews'" class="py-8 space-y-6">
-            @for($i = 1; $i <= 3; $i++)
-            <div class="border-b border-gray-200 pb-6">
-                <div class="flex items-start justify-between mb-2">
-                    <div>
-                        <p class="font-medium text-gray-900">John Doe</p>
-                        <p class="text-sm text-gray-500">Verified Purchase</p>
-                    </div>
-                    <span class="text-yellow-400">★★★★★</span>
-                </div>
-                <p class="text-gray-600 mt-2">
-                    Amazing sound quality! The noise cancellation works perfectly on my daily commute. Battery life is excellent, and they're very comfortable even after hours of use.
-                </p>
-                <p class="text-sm text-gray-500 mt-2">Posted on January 15, 2026</p>
-            </div>
-            @endfor
-        </div>
+        @endif
     </div>
 
     <!-- Related Products -->
+    @if($relatedProducts->isNotEmpty())
     <div class="mt-16">
         <h2 class="text-2xl font-bold text-gray-900 mb-8">You May Also Like</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            @for($i = 1; $i <= 4; $i++)
-            <x-card padding="false">
-                <div class="aspect-w-1 aspect-h-1 bg-gray-200">
-                    <div class="w-full h-48 bg-gradient-to-br from-blue-50 to-purple-50"></div>
-                </div>
-                <div class="p-4">
-                    <h3 class="text-sm font-semibold text-gray-900 mb-2">Similar Product {{ $i }}</h3>
-                    <div class="flex items-center justify-between">
-                        <span class="text-lg font-bold text-gray-900">${{ rand(50, 300) }}.99</span>
-                        <span class="text-yellow-400 text-sm">★★★★☆</span>
+            @foreach($relatedProducts as $relatedProduct)
+            <a href="{{ route('products.show', $relatedProduct->slug) }}" class="group">
+                <x-card padding="false">
+                    <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-t-lg overflow-hidden">
+                        @if($relatedProduct->primaryImageUrl)
+                            <img src="{{ $relatedProduct->primaryImageUrl }}" 
+                                 alt="{{ $relatedProduct->name }}" 
+                                 class="w-full h-48 object-cover group-hover:scale-105 transition">
+                        @else
+                            <div class="w-full h-48 bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
+                                <svg class="h-16 w-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                                </svg>
+                            </div>
+                        @endif
                     </div>
-                </div>
-            </x-card>
-            @endfor
+                    <div class="p-4">
+                        <h3 class="text-sm font-semibold text-gray-900 mb-2 line-clamp-2">{{ $relatedProduct->name }}</h3>
+                        <div class="flex items-center justify-between">
+                            @if($relatedProduct->isOnSale)
+                                <div>
+                                    <span class="text-lg font-bold text-gray-900">{{ currency($relatedProduct->salePrice) }}</span>
+                                    <span class="text-sm text-gray-500 line-through ml-2">{{ currency($relatedProduct->price) }}</span>
+                                </div>
+                            @else
+                                <span class="text-lg font-bold text-gray-900">{{ currency($relatedProduct->price) }}</span>
+                            @endif
+                        </div>
+                    </div>
+                </x-card>
+            </a>
+            @endforeach
         </div>
     </div>
+    @endif
 </div>
+
+@push('scripts')
+<script>
+    function changeMainImage(imageSrc) {
+        const mainImage = document.getElementById('mainImage');
+        if (mainImage) {
+            mainImage.src = imageSrc;
+        }
+    }
+</script>
+@endpush
 @endsection

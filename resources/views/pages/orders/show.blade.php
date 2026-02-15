@@ -122,20 +122,20 @@
 
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-gray-600">Subtotal</span>
-                        <span class="font-medium text-gray-900">${{ number_format($order->subtotal, 2) }}</span>
+                        <span class="font-medium text-gray-900">{{ currency($order->subtotal) }}</span>
                     </div>
 
                     @if($order->tax > 0)
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-gray-600">Tax</span>
-                        <span class="font-medium text-gray-900">${{ number_format($order->tax, 2) }}</span>
+                        <span class="font-medium text-gray-900">{{ currency($order->tax) }}</span>
                     </div>
                     @endif
 
                     @if($order->shipping_fee > 0)
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-gray-600">Shipping</span>
-                        <span class="font-medium text-gray-900">${{ number_format($order->shipping_fee, 2) }}</span>
+                        <span class="font-medium text-gray-900">{{ currency($order->shipping_fee) }}</span>
                     </div>
                     @else
                     <div class="flex items-center justify-between text-sm">
@@ -148,7 +148,7 @@
 
                     <div class="flex items-center justify-between">
                         <span class="text-lg font-bold text-gray-900">Total</span>
-                        <span class="text-2xl font-bold text-gray-900">${{ number_format($order->total_amount, 2) }}</span>
+                        <span class="text-2xl font-bold text-gray-900">{{ currency($order->total_amount) }}</span>
                     </div>
                 </div>
 

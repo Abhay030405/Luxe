@@ -41,7 +41,7 @@
                     <div>
                         <p class="text-sm text-gray-600">Total Spent</p>
                         <p class="mt-1 text-2xl font-bold text-gray-900">
-                            ${{ number_format($customer->orders->sum('total_amount'), 2) }}
+                            {{ currency($customer->orders->sum('total_amount')) }}
                         </p>
                     </div>
                     <div>
@@ -93,7 +93,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    ${{ number_format($order->total_amount, 2) }}
+                                    {{ currency($order->total_amount) }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <a href="{{ route('admin.orders.show', $order->id) }}" 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\User\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\User\Repositories\Contracts\AddressRepositoryInterface;
 use App\Modules\User\Requests\StoreAddressRequest;
 use App\Modules\User\Requests\UpdateAddressRequest;
 use App\Modules\User\Services\AddressService;
@@ -14,7 +15,8 @@ use Illuminate\View\View;
 class AddressController extends Controller
 {
     public function __construct(
-        private readonly AddressService $addressService
+        private readonly AddressService $addressService,
+        private readonly AddressRepositoryInterface $addressRepository
     ) {}
 
     /**
@@ -34,7 +36,11 @@ class AddressController extends Controller
      */
     public function create(): View
     {
-        return view('pages.user.addresses.create');
+        $redirectTo = request()->query('redirect_to');
+
+        return view('pages.user.addresses.create', [
+            'redirectTo' => $redirectTo,
+        ]);
     }
 
     /**
@@ -47,6 +53,14 @@ class AddressController extends Controller
             $request->validated()
         );
 
+        // Check if there's a redirect_to parameter
+        $redirectTo = $request->input('redirect_to');
+
+        if ($redirectTo === 'checkout') {
+            return redirect()->route('checkout.index')
+                ->with('success', 'Address added successfully. Please complete your order.');
+        }
+
         return redirect()->route('addresses.index')
             ->with('success', 'Address added successfully.');
     }
@@ -56,6 +70,12 @@ class AddressController extends Controller
      */
     public function edit(int $id): View
     {
+        $addressModel = $this->addressRepository->findByIdAndUser($id, auth()->id());
+
+        abort_if(! $addressModel, 404);
+
+        $this->authorize('update', $addressModel);
+
         $address = $this->addressService->getAddressForUser($id, auth()->id());
 
         return view('pages.user.addresses.edit', [
@@ -68,6 +88,12 @@ class AddressController extends Controller
      */
     public function update(UpdateAddressRequest $request, int $id): RedirectResponse
     {
+        $addressModel = $this->addressRepository->findByIdAndUser($id, $request->user()->id);
+
+        abort_if(! $addressModel, 404);
+
+        $this->authorize('update', $addressModel);
+
         $this->addressService->updateAddress(
             $id,
             $request->user()->id,
@@ -83,10 +109,21 @@ class AddressController extends Controller
      */
     public function destroy(int $id): RedirectResponse
     {
-        $this->addressService->deleteAddress($id, auth()->id());
+        $addressModel = $this->addressRepository->findByIdAndUser($id, auth()->id());
 
-        return redirect()->route('addresses.index')
-            ->with('success', 'Address deleted successfully.');
+        abort_if(! $addressModel, 404);
+
+        $this->authorize('delete', $addressModel);
+
+        try {
+            $this->addressService->deleteAddress($id, auth()->id());
+
+            return redirect()->route('addresses.index')
+                ->with('success', 'Address deleted successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->route('addresses.index')
+                ->withErrors($e->errors());
+        }
     }
 
     /**
@@ -94,6 +131,12 @@ class AddressController extends Controller
      */
     public function setDefault(int $id): RedirectResponse
     {
+        $addressModel = $this->addressRepository->findByIdAndUser($id, auth()->id());
+
+        abort_if(! $addressModel, 404);
+
+        $this->authorize('setDefault', $addressModel);
+
         $this->addressService->setDefaultAddress($id, auth()->id());
 
         return redirect()->route('addresses.index')

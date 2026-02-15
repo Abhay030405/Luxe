@@ -50,16 +50,22 @@ class CartRepository implements CartRepositoryInterface
             $cartItem->price_at_time = $price; // Update price to latest
             $cartItem->save();
 
-            return $cartItem->load(['product.images', 'product.category']);
+            $cartItem->load(['product']);
+
+            return $cartItem;
         }
 
         // Create new cart item
-        return $this->model->create([
+        $newCartItem = $this->model->create([
             'user_id' => $userId,
             'product_id' => $productId,
             'quantity' => $quantity,
             'price_at_time' => $price,
-        ])->load(['product.images', 'product.category']);
+        ]);
+
+        $newCartItem->load(['product']);
+
+        return $newCartItem;
     }
 
     /**

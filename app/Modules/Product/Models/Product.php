@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Modules\Product\Models;
 
+use App\Modules\Inventory\Models\Inventory;
 use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
@@ -78,6 +80,14 @@ class Product extends Model
     public function primaryImage()
     {
         return $this->hasOne(ProductImage::class)->where('is_primary', true);
+    }
+
+    /**
+     * Get the inventory record for this product.
+     */
+    public function inventory(): HasOne
+    {
+        return $this->hasOne(Inventory::class);
     }
 
     /**

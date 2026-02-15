@@ -7,6 +7,7 @@ use App\Modules\Admin\Controllers\CustomerController;
 use App\Modules\Admin\Controllers\DashboardController;
 use App\Modules\Admin\Controllers\OrderController;
 use App\Modules\Admin\Controllers\ProductController;
+use App\Modules\Admin\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -99,5 +100,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
         Route::get('/{id}', [CustomerController::class, 'show'])
             ->name('show');
+    });
+
+    // Site Settings
+    Route::prefix('settings')->name('settings.')->group(function (): void {
+        Route::get('/', [SettingsController::class, 'index'])
+            ->name('index');
+
+        Route::put('/', [SettingsController::class, 'update'])
+            ->name('update');
     });
 });

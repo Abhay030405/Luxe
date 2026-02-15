@@ -45,13 +45,11 @@ class CartController extends Controller
                 quantity: $request->integer('quantity', 1)
             );
 
-            return redirect()
-                ->back()
-                ->with('success', 'Product added to cart successfully!');
+            return redirect()->back()->with('success', 'Product added to cart successfully!');
         } catch (InvalidArgumentException $e) {
-            return redirect()
-                ->back()
-                ->with('error', $e->getMessage());
+            return redirect()->back()->with('error', $e->getMessage());
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'An unexpected error occurred. Please try again.');
         }
     }
 

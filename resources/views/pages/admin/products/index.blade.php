@@ -83,8 +83,8 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
-                                @if($product->primaryImage)
-                                    <img src="{{ asset('storage/' . $product->primaryImage->image_path) }}" alt="{{ $product->name }}" class="h-12 w-12 rounded-lg object-cover flex-shrink-0">
+                                @if($product->primaryImageUrl)
+                                    <img src="{{ $product->primaryImageUrl }}" alt="{{ $product->name }}" class="h-12 w-12 rounded-lg object-cover flex-shrink-0">
                                 @else
                                     <div class="h-12 w-12 rounded-lg bg-gray-200 flex items-center justify-center flex-shrink-0">
                                         <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -94,7 +94,7 @@
                                 @endif
                                 <div class="ml-4">
                                     <div class="text-sm font-medium text-gray-900">{{ $product->name }}</div>
-                                    <div class="text-xs text-gray-500">Created {{ $product->created_at->format('M d, Y') }}</div>
+                                    <div class="text-xs text-gray-500">Created {{ \Carbon\Carbon::parse($product->createdAt)->format('M d, Y') }}</div>
                                 </div>
                             </div>
                         </td>
@@ -102,21 +102,21 @@
                             <span class="font-mono text-sm text-gray-600">{{ $product->sku }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="text-sm text-gray-900">{{ $product->category->name ?? '—' }}</span>
+                            <span class="text-sm text-gray-900">{{ $product->categoryName ?? '—' }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            @if($product->sale_price)
+                            @if($product->salePrice)
                                 <div class="flex flex-col">
-                                    <span class="text-sm font-semibold text-gray-900">${{ number_format($product->sale_price, 2) }}</span>
-                                    <span class="text-xs text-gray-500 line-through">${{ number_format($product->price, 2) }}</span>
+                                    <span class="text-sm font-semibold text-gray-900">{{ currency($product->salePrice) }}</span>
+                                    <span class="text-xs text-gray-500 line-through">{{ currency($product->price) }}</span>
                                 </div>
                             @else
-                                <span class="text-sm font-semibold text-gray-900">${{ number_format($product->price, 2) }}</span>
+                                <span class="text-sm font-semibold text-gray-900">{{ currency($product->price) }}</span>
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="text-sm font-medium {{ $product->stock_quantity < 10 ? 'text-red-600' : 'text-gray-900' }}">
-                                {{ $product->stock_quantity }} units
+                            <span class="text-sm font-medium {{ $product->stockQuantity < 10 ? 'text-red-600' : 'text-gray-900' }}">
+                                {{ $product->stockQuantity }} units
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -129,12 +129,12 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             <div class="flex items-center space-x-2">
-                                <a href="{{ route('admin.products.edit', $product) }}" class="text-blue-600 hover:text-blue-900" title="Edit">
+                                <a href="{{ route('admin.products.edit', $product->id) }}" class="text-blue-600 hover:text-blue-900" title="Edit">
                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                                     </svg>
                                 </a>
-                                <form action="{{ route('admin.products.destroy', $product) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this product?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:text-red-900" title="Delete">

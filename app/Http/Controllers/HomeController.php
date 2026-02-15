@@ -5,29 +5,22 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Modules\Product\Models\Category;
-use App\Modules\Product\Models\Product;
+use App\Modules\Product\Services\ProductService;
 use Illuminate\View\View;
 
 class HomeController extends Controller
 {
+    public function __construct(
+        private readonly ProductService $productService
+    ) {}
+
     public function index(): View
     {
         // Fetch featured products (for hero section showcase)
-        $featuredProducts = Product::with(['images', 'primaryImage'])
-            ->where('is_featured', true)
-            ->where('status', 'active')
-            ->where('stock_quantity', '>', 0)
-            ->latest()
-            ->take(4)
-            ->get();
+        $featuredProducts = $this->productService->getFeaturedProducts(limit: 4);
 
         // Fetch latest/new arrival products
-        $newArrivals = Product::with(['images', 'primaryImage'])
-            ->where('status', 'active')
-            ->where('stock_quantity', '>', 0)
-            ->latest()
-            ->take(8)
-            ->get();
+        $newArrivals = $this->productService->getLatestProducts(limit: 8);
 
         // Fetch main categories for category highlights
         $categories = Category::where('is_active', true)

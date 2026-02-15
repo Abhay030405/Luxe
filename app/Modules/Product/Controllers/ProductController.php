@@ -47,6 +47,9 @@ class ProductController extends Controller
             'sort_order' => $sortOrder,
         ];
 
+        // Temporary debug - will remove after testing
+        logger('Product filters received:', $filters);
+
         $products = $this->productService->getPaginatedProducts($filters, 12);
         $categories = $this->categoryService->getRootCategories();
 

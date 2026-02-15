@@ -151,7 +151,7 @@
                         {{ $order->items->count() }} items
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="text-sm font-semibold text-gray-900">${{ number_format($order->total_amount, 2) }}</span>
+                        <span class="text-sm font-semibold text-gray-900">{{ currency($order->total_amount) }}</span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $order->status->badgeClass() }}">

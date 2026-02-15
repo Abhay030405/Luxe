@@ -32,9 +32,13 @@ class ProductRepository implements ProductRepositoryInterface
     {
         $query = $this->model->with(['category', 'images']);
 
+        // Temporary debug - will remove after testing
+        logger('Repository applying filters:', $filters);
+
         // Filter by category
         if (! empty($filters['category_id'])) {
             $query->where('category_id', $filters['category_id']);
+            logger('Applying category filter:', ['category_id' => $filters['category_id']]);
         }
 
         // Filter by status
@@ -47,15 +51,18 @@ class ProductRepository implements ProductRepositoryInterface
         // Filter by price range
         if (! empty($filters['min_price'])) {
             $query->where('price', '>=', $filters['min_price']);
+            logger('Applying min_price filter:', ['min_price' => $filters['min_price']]);
         }
 
         if (! empty($filters['max_price'])) {
             $query->where('price', '<=', $filters['max_price']);
+            logger('Applying max_price filter:', ['max_price' => $filters['max_price']]);
         }
 
         // Filter by featured
         if (! empty($filters['is_featured'])) {
             $query->featured();
+            logger('Applying featured filter');
         }
 
         // Filter by in stock
@@ -68,7 +75,10 @@ class ProductRepository implements ProductRepositoryInterface
         $sortOrder = $filters['sort_order'] ?? 'desc';
         $query->orderBy($sortBy, $sortOrder);
 
-        return $query->paginate($perPage);
+        $results = $query->paginate($perPage);
+        logger('Query result count:', ['count' => $results->count(), 'total' => $results->total()]);
+
+        return $results;
     }
 
     /**

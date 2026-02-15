@@ -192,6 +192,19 @@ class AddressTest extends TestCase
         $this->assertDatabaseMissing('addresses', ['id' => $address->id]);
     }
 
+    public function test_user_cannot_delete_another_users_address(): void
+    {
+        $otherUser = User::factory()->create();
+        $otherUsersAddress = Address::factory()->create(['user_id' => $otherUser->id]);
+
+        $response = $this->actingAs($this->user)
+            ->delete(route('addresses.destroy', $otherUsersAddress->id));
+
+        $response->assertStatus(404);
+
+        $this->assertDatabaseHas('addresses', ['id' => $otherUsersAddress->id]);
+    }
+
     public function test_cannot_delete_only_address(): void
     {
         $address = Address::factory()->create(['user_id' => $this->user->id]);

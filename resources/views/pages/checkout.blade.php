@@ -111,7 +111,7 @@
                                     <p class="text-sm font-medium text-gray-900 truncate">{{ $cartItem->product->name }}</p>
                                     <p class="text-sm text-gray-500">{{ $cartItem->product->category->name ?? '' }}</p>
                                 </div>
-                                <span class="text-sm font-semibold text-gray-900">${{ number_format($cartItem->subtotal, 2) }}</span>
+                                <span class="text-sm font-semibold text-gray-900">{{ currency($cartItem->subtotal) }}</span>
                             </div>
                         @endforeach
                     </div>

@@ -7,6 +7,7 @@ namespace App\Modules\Cart\Services;
 use App\Modules\Cart\DTOs\CartItemDTO;
 use App\Modules\Cart\DTOs\CartSummaryDTO;
 use App\Modules\Cart\Repositories\Contracts\CartRepositoryInterface;
+use App\Modules\Inventory\Services\InventoryService;
 use App\Modules\Product\Repositories\Contracts\ProductRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -15,7 +16,8 @@ class CartService
 {
     public function __construct(
         private readonly CartRepositoryInterface $cartRepository,
-        private readonly ProductRepositoryInterface $productRepository
+        private readonly ProductRepositoryInterface $productRepository,
+        private readonly InventoryService $inventoryService
     ) {}
 
     /**
@@ -50,19 +52,23 @@ class CartService
         if ($product->status !== 'active') {
             throw new InvalidArgumentException('Product is not available');
         }
-
-        if (! $product->isInStock()) {
-            throw new InvalidArgumentException('Product is out of stock');
+        // Check inventory availability (not just product.stock_quantity)
+        if (! $this->inventoryService->checkAvailability($productId, $quantity)) {
+            throw new InvalidArgumentException('Insufficient stock available');
         }
 
-        // Check if adding this quantity would exceed stock
+        // Check if adding this quantity would exceed available stock
         $existingCartItem = $this->cartRepository->findByUserAndProduct($userId, $productId);
         $currentQuantityInCart = $existingCartItem?->quantity ?? 0;
         $newTotalQuantity = $currentQuantityInCart + $quantity;
 
-        if ($newTotalQuantity > $product->stock_quantity) {
+        if (! $this->inventoryService->checkAvailability($productId, $newTotalQuantity)) {
+            // Get available stock from inventory or fallback to product stock_quantity
+            $inventory = $product->inventory;
+            $availableStock = $inventory ? $inventory->quantity_available : $product->stock_quantity;
+
             throw new InvalidArgumentException(
-                "Cannot add {$quantity} items. Only {$product->stock_quantity} available in stock"
+                "Cannot add {$quantity} items. Only {$availableStock} available in stock"
             );
         }
 
@@ -95,17 +101,20 @@ class CartService
             throw new InvalidArgumentException('Unauthorized access to cart item');
         }
 
-        // Check stock availability
+        // Check inventory availability (not just product.stock_quantity)
         $product = $cartItem->product;
 
-        if ($quantity > $product->stock_quantity) {
+        if (! $this->inventoryService->checkAvailability($product->id, $quantity)) {
+            $inventory = $product->inventory;
+            $availableStock = $inventory ? $inventory->quantity_available : 0;
+
             throw new InvalidArgumentException(
-                "Cannot set quantity to {$quantity}. Only {$product->stock_quantity} available in stock"
+                "Cannot set quantity to {$quantity}. Only {$availableStock} available in stock"
             );
         }
 
-        if (! $product->isInStock()) {
-            throw new InvalidArgumentException('Product is out of stock');
+        if ($product->status !== 'active') {
+            throw new InvalidArgumentException('Product is no longer available');
         }
 
         // Update quantity
@@ -185,21 +194,15 @@ class CartService
                 continue;
             }
 
-            // Check stock availability
-            if ($cartItem->quantity > $product->stock_quantity) {
-                $issues[] = [
-                    'cart_item_id' => $cartItem->id,
-                    'product_name' => $product->name,
-                    'issue' => "Requested quantity ({$cartItem->quantity}) exceeds available stock ({$product->stock_quantity})",
-                ];
-            }
+            // Check inventory availability (critical for preventing overselling)
+            if (! $this->inventoryService->checkAvailability($product->id, $cartItem->quantity)) {
+                $inventory = $product->inventory;
+                $availableStock = $inventory ? $inventory->quantity_available : 0;
 
-            // Check if product is still in stock
-            if (! $product->isInStock()) {
                 $issues[] = [
                     'cart_item_id' => $cartItem->id,
                     'product_name' => $product->name,
-                    'issue' => 'Product is out of stock',
+                    'issue' => "Requested quantity ({$cartItem->quantity}) exceeds available stock ({$availableStock})",
                 ];
             }
         }
