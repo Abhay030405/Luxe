@@ -7,6 +7,7 @@ namespace App\Modules\Product\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Product\Services\CategoryService;
 use App\Modules\Product\Services\ProductService;
+use App\Modules\Wishlist\Services\WishlistService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use InvalidArgumentException;
@@ -15,7 +16,8 @@ class ProductController extends Controller
 {
     public function __construct(
         private readonly ProductService $productService,
-        private readonly CategoryService $categoryService
+        private readonly CategoryService $categoryService,
+        private readonly WishlistService $wishlistService
     ) {}
 
     /**
@@ -68,7 +70,13 @@ class ProductController extends Controller
             $product = $this->productService->getProductBySlug($slug);
             $relatedProducts = $this->productService->getProductsByCategory($product->categoryId, 4);
 
-            return view('pages.product.show', compact('product', 'relatedProducts'));
+            // Check if product is in wishlist for authenticated users
+            $isInWishlist = false;
+            if (auth()->check()) {
+                $isInWishlist = $this->wishlistService->isInWishlist(auth()->id(), $product->id);
+            }
+
+            return view('pages.product.show', compact('product', 'relatedProducts', 'isInWishlist'));
         } catch (InvalidArgumentException $e) {
             abort(404, $e->getMessage());
         }

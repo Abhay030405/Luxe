@@ -8,15 +8,18 @@ use App\Http\Controllers\Controller;
 use App\Modules\Cart\Requests\AddToCartRequest;
 use App\Modules\Cart\Requests\UpdateCartItemRequest;
 use App\Modules\Cart\Services\CartService;
+use App\Modules\Wishlist\Services\WishlistService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 use InvalidArgumentException;
 
 class CartController extends Controller
 {
     public function __construct(
-        private readonly CartService $cartService
+        private readonly CartService $cartService,
+        private readonly WishlistService $wishlistService
     ) {}
 
     /**
@@ -188,6 +191,42 @@ class CartController extends Controller
                 'success' => false,
                 'message' => $e->getMessage(),
             ], 422);
+        }
+    }
+
+    /**
+     * Remove item from cart and optionally add to wishlist.
+     */
+    public function removeWithWishlistOption(Request $request, int $cartItemId): RedirectResponse
+    {
+        try {
+            $userId = auth()->id();
+
+            // Get cart item before removing to get product_id
+            $cart = $this->cartService->getUserCart($userId);
+            $cartItem = $cart->items->firstWhere('id', $cartItemId);
+
+            if (! $cartItem) {
+                return redirect()->back()->with('error', 'Cart item not found.');
+            }
+
+            $productId = $cartItem->productId;
+
+            // Add to wishlist if requested
+            if ($request->boolean('add_to_wishlist')) {
+                $this->wishlistService->addToWishlist($userId, $productId);
+            }
+
+            // Remove from cart
+            $this->cartService->removeFromCart($userId, $cartItemId);
+
+            $message = $request->boolean('add_to_wishlist')
+                ? 'Item moved to wishlist successfully!'
+                : 'Item removed from cart successfully!';
+
+            return redirect()->route('cart.index')->with('success', $message);
+        } catch (InvalidArgumentException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 

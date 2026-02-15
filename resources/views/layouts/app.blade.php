@@ -55,11 +55,22 @@
                     <div class="flex items-center space-x-2 sm:space-x-4">
                         @auth
                             <!-- Wishlist Icon -->
-                            <a href="#" class="relative rounded-full bg-white p-2 text-gray-500 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 transition">
+                            <a href="{{ route('wishlist.index') }}" class="relative rounded-full bg-white p-2 text-gray-500 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 transition" id="wishlist-icon">
                                 <span class="sr-only">Wishlist</span>
                                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
                                 </svg>
+                                @php
+                                    $wishlistCount = 0;
+                                    if (auth()->check()) {
+                                        $wishlistCount = app(App\Modules\Wishlist\Services\WishlistService::class)->getWishlistCount(auth()->id());
+                                    }
+                                @endphp
+                                @if($wishlistCount > 0)
+                                    <span class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white" id="wishlist-count">{{ $wishlistCount }}</span>
+                                @else
+                                    <span class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white hidden" id="wishlist-count">0</span>
+                                @endif
                             </a>
                             
                             <!-- Cart Icon -->
@@ -89,7 +100,7 @@
                                     <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</a>
                                     <a href="{{ route('profile.show') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
                                     <a href="{{ route('orders.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Orders</a>
-                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Wishlist</a>
+                                    <a href="{{ route('wishlist.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Wishlist</a>
                                     @if(Auth::user()->is_admin)
                                         <div class="border-t border-gray-100"></div>
                                         <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50">

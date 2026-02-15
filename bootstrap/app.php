@@ -27,6 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::middleware('web')
                 ->group(base_path('app/Modules/Cart/Routes.php'));
 
+            // Register Wishlist module routes
+            Route::middleware('web')
+                ->group(base_path('app/Modules/Wishlist/Routes.php'));
+
             // Register Order module routes
             Route::middleware('web')
                 ->group(base_path('app/Modules/Order/Routes.php'));

@@ -103,7 +103,7 @@
         </div>
 
         <!-- Wishlist -->
-        <div class="overflow-hidden rounded-lg bg-white shadow border border-gray-200">
+        <a href="{{ route('wishlist.index') }}" class="overflow-hidden rounded-lg bg-white shadow border border-gray-200 hover:shadow-lg transition">
             <div class="p-6">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
@@ -116,12 +116,12 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Wishlist</dt>
-                            <dd class="text-2xl font-bold text-gray-900">0</dd>
+                            <dd class="text-2xl font-bold text-gray-900">{{ $wishlistCount ?? 0 }}</dd>
                         </dl>
                     </div>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
 
     <!-- Account Information -->
@@ -159,7 +159,7 @@
                 <h3 class="text-lg font-semibold text-gray-900">Quick Actions</h3>
             </div>
             <div class="px-6 py-5 space-y-3">
-                <a href="#" class="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition group">
+                <a href="{{ route('orders.index') }}" class="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition group">
                     <div class="flex items-center space-x-3">
                         <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 group-hover:bg-blue-200 transition">
                             <svg class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -196,6 +196,20 @@
                             </svg>
                         </div>
                         <span class="text-sm font-medium text-gray-900">Manage Addresses</span>
+                    </div>
+                    <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                </a>
+
+                <a href="{{ route('wishlist.index') }}" class="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition group">
+                    <div class="flex items-center space-x-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 group-hover:bg-red-200 transition">
+                            <svg class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                            </svg>
+                        </div>
+                        <span class="text-sm font-medium text-gray-900">My Wishlist</span>
                     </div>
                     <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />

@@ -155,7 +155,10 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex space-x-4 mb-6">
+            <div class="flex space-x-4 mb-6" x-data="{ 
+                inWishlist: {{ auth()->check() ? ($isInWishlist ? 'true' : 'false') : 'false' }}, 
+                loading: false 
+            }">
                 @auth
                     @if($product->isInStock)
                     <button form="addToCartForm" type="submit" class="flex-1 inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition">
@@ -169,16 +172,29 @@
                         Out of Stock
                     </button>
                     @endif
+                    
+                    <!-- Wishlist Button -->
+                    <button 
+                        @click="toggleWishlist()"
+                        :disabled="loading"
+                        :class="inWishlist ? 'bg-red-50 border-red-500 text-red-600 hover:bg-red-100' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'"
+                        class="inline-flex items-center justify-center px-3 py-3 text-base font-medium border-2 rounded-lg transition disabled:opacity-50 cursor-pointer"
+                        :title="inWishlist ? 'Remove from wishlist' : 'Add to wishlist'"
+                    >
+                        <svg class="h-6 w-6" viewBox="0 0 24 24" stroke-width="1.5" :stroke="inWishlist ? 'currentColor' : 'currentColor'" :fill="inWishlist ? 'currentColor' : 'none'">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                        </svg>
+                    </button>
                 @else
-                <a href="{{ route('login') }}" class="flex-1 inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition">
-                    Login to Add to Cart
-                </a>
+                    <a href="{{ route('login') }}" class="flex-1 inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition">
+                        Login to Add to Cart
+                    </a>
+                    <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-3 py-3 text-base font-medium text-gray-600 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition" title="Login to add to wishlist">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                        </svg>
+                    </a>
                 @endauth
-                <x-button variant="outline" size="lg">
-                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                    </svg>
-                </x-button>
             </div>
 
             @if($product->isInStock)
@@ -320,6 +336,101 @@
         if (mainImage) {
             mainImage.src = imageSrc;
         }
+    }
+
+    function toggleWishlist() {
+        this.loading = true;
+
+        fetch('{{ route('wishlist.toggle') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({
+                product_id: {{ $product->id }}
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                this.inWishlist = !this.inWishlist;
+                
+                // Update wishlist counter in navigation
+                updateWishlistCounter(data.count || 0);
+                
+                // Show notification with the actual message from the API
+                showNotification(data.message || 'Wishlist updated successfully!', 'success');
+            } else {
+                showNotification(data.message || 'Something went wrong', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Failed to update wishlist', 'error');
+        })
+        .finally(() => {
+            this.loading = false;
+        });
+    }
+
+    function updateWishlistCounter(count) {
+        const counterElement = document.getElementById('wishlist-count');
+        if (counterElement) {
+            counterElement.textContent = count;
+            if (count > 0) {
+                counterElement.classList.remove('hidden');
+            } else {
+                counterElement.classList.add('hidden');
+            }
+        }
+    }
+
+    function showNotification(message, type = 'success') {
+        // Create notification element
+        const notification = document.createElement('div');
+        
+        const colors = {
+            success: 'bg-green-50 border-green-200 text-green-800',
+            error: 'bg-red-50 border-red-200 text-red-800'
+        };
+        
+        const icons = {
+            success: '<svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+            error: '<svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>'
+        };
+        
+        notification.className = `fixed top-20 right-4 z-50 rounded-lg border p-4 flex items-start space-x-3 shadow-lg ${colors[type]} transform transition-all duration-300 translate-x-0 max-w-md`;
+        notification.innerHTML = `
+            ${icons[type]}
+            <div class="flex-1">
+                <p class="text-sm font-medium">${message}</p>
+            </div>
+            <button onclick="this.parentElement.remove()" class="flex-shrink-0 hover:opacity-75 transition">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Animate in
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+        }, 10);
+        
+        // Remove after 4 seconds
+        setTimeout(() => {
+            notification.style.transform = 'translateX(150%)';
+            notification.style.opacity = '0';
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.parentElement.removeChild(notification);
+                }
+            }, 300);
+        }, 4000);
     }
 </script>
 @endpush

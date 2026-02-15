@@ -32,6 +32,10 @@ Route::middleware('auth')->group(function (): void {
     Route::delete('/cart/{cartItemId}', [CartController::class, 'destroy'])
         ->name('cart.destroy');
 
+    // Remove item from cart with wishlist option
+    Route::post('/cart/{cartItemId}/remove-with-wishlist', [CartController::class, 'removeWithWishlistOption'])
+        ->name('cart.removeWithWishlist');
+
     // Clear cart
     Route::delete('/cart', [CartController::class, 'clear'])
         ->name('cart.clear');
