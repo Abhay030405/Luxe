@@ -30,6 +30,7 @@ class CheckoutService
         private readonly CartRepositoryInterface $cartRepository,
         private readonly OrderRepository $orderRepository,
         private readonly ProductRepositoryInterface $productRepository,
+        private readonly VendorOrderService $vendorOrderService,
     ) {}
 
     /**
@@ -110,18 +111,21 @@ class CheckoutService
                 // Step 6: Create order with items (atomic operation in repository)
                 $order = $this->orderRepository->createOrderWithItems($createOrderDTO);
 
-                // Step 7: Decrement product stock
+                // Step 7: Split order into vendor orders
+                $this->vendorOrderService->splitOrderIntoVendorOrders($order);
+
+                // Step 8: Decrement product stock
                 foreach ($items as $item) {
                     $this->decrementProductStock($item->productId, $item->quantity);
                 }
 
-                // Step 8: Clear cart
+                // Step 9: Clear cart
                 $this->cartRepository->clearUserCart($checkoutDTO->userId);
 
-                // Step 9: Dispatch order placed event
+                // Step 10: Dispatch order placed event
                 event(new OrderPlaced($order));
 
-                // Step 10: Log successful order
+                // Step 11: Log successful order
                 Log::info('Order placed successfully', [
                     'order_id' => $order->id,
                     'order_number' => $order->order_number,

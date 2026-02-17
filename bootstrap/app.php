@@ -38,12 +38,17 @@ return Application::configure(basePath: dirname(__DIR__))
             // Register Admin module routes
             Route::middleware('web')
                 ->group(base_path('app/Modules/Admin/Routes.php'));
+
+            // Register Vendor module routes
+            Route::middleware('web')
+                ->group(base_path('app/Modules/Vendor/Routes.php'));
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
         // Register middleware aliases
         $middleware->alias([
             'admin' => \App\Http\Middleware\IsAdmin::class,
+            'vendor' => \App\Http\Middleware\IsVendor::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -20,6 +20,7 @@ class OrderItem extends Model
      */
     protected $fillable = [
         'order_id',
+        'vendor_order_id',
         'product_id',
         'product_name',
         'product_sku',
@@ -48,6 +49,14 @@ class OrderItem extends Model
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+
+    /**
+     * Get the vendor order that owns the item.
+     */
+    public function vendorOrder(): BelongsTo
+    {
+        return $this->belongsTo(VendorOrder::class);
     }
 
     /**

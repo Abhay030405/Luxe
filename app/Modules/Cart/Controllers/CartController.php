@@ -48,6 +48,11 @@ class CartController extends Controller
                 quantity: $request->integer('quantity', 1)
             );
 
+            // Check if this is a "Buy Now" action
+            if ($request->boolean('buy_now')) {
+                return redirect()->route('checkout.index')->with('success', 'Proceeding to checkout!');
+            }
+
             return redirect()->back()->with('success', 'Product added to cart successfully!');
         } catch (InvalidArgumentException $e) {
             return redirect()->back()->with('error', $e->getMessage());

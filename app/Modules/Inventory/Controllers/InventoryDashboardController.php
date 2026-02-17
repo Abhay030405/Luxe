@@ -23,7 +23,7 @@ class InventoryDashboardController extends Controller
         $lowStockProducts = $this->inventoryService->getLowStockProducts();
         $outOfStockProducts = $this->inventoryService->getOutOfStockProducts();
 
-        return view('inventory.dashboard', [
+        return view('pages.admin.inventory.dashboard', [
             'lowStockProducts' => $lowStockProducts,
             'outOfStockProducts' => $outOfStockProducts,
             'lowStockCount' => $lowStockProducts->count(),
@@ -40,8 +40,10 @@ class InventoryDashboardController extends Controller
             ->orderBy('quantity_available', 'asc')
             ->paginate(50);
 
-        return view('inventory.manage', [
+        return view('pages.admin.inventory.index', [
             'inventories' => $inventories,
+            'lowStockCount' => Inventory::lowStock()->count(),
+            'outOfStockCount' => Inventory::outOfStock()->count(),
         ]);
     }
 }

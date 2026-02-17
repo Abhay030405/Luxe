@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #6B7280; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+        .alert-box { background: #FEE2E2; border-left: 4px solid #EF4444; padding: 15px; margin: 20px 0; border-radius: 4px; }
+        .order-details { background: white; padding: 20px; border-radius: 6px; margin: 20px 0; }
+        .footer { text-align: center; padding: 20px; color: #6b7280; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Order Rejected</h1>
+        </div>
+        <div class="content">
+            <p>Hi {{ $customer->name }},</p>
+            
+            <p>We're writing to inform you that <strong>{{ $vendor->business_name }}</strong> was unable to fulfill your order and has rejected it.</p>
+            
+            <div class="alert-box">
+                <strong>Rejection Reason:</strong><br>
+                {{ $reason ?? 'No reason provided' }}
+            </div>
+            
+            <div class="order-details">
+                <h3>Rejected Order Details</h3>
+                <p><strong>Vendor Order Number:</strong> {{ $vendorOrder->vendor_order_number }}</p>
+                <p><strong>Order Total:</strong> ${{ number_format($vendorOrder->subtotal, 2) }}</p>
+            </div>
+            
+            <p>If you were charged for this order, a refund will be processed to your original payment method within 5-7 business days.</p>
+            
+            <p>We apologize for this inconvenience. You may want to browse similar products from other vendors on our marketplace.</p>
+            
+            <p style="margin-top: 30px;">Thank you for your understanding.</p>
+        </div>
+        <div class="footer">
+            <p>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -69,6 +69,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -103,6 +104,16 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="text-sm text-gray-900">{{ $product->categoryName ?? '—' }}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @if($product->vendorName)
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-medium text-gray-900">{{ $product->vendorName }}</span>
+                                    <span class="text-xs text-gray-500">ID: {{ $product->vendorId }}</span>
+                                </div>
+                            @else
+                                <span class="text-sm text-gray-500 italic">Admin Product</span>
+                            @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($product->salePrice)

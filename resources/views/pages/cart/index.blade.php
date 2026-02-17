@@ -233,7 +233,7 @@
          aria-modal="true"
          x-cloak>
         <!-- Background overlay -->
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" 
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-30 transition-opacity" 
              x-show="showRemoveModal"
              x-transition:enter="ease-out duration-300"
              x-transition:enter-start="opacity-0"

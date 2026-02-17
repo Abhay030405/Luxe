@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Product\Services;
 
 use App\Modules\Product\DTOs\ProductDTO;
+use App\Modules\Product\Models\ProductImage;
 use App\Modules\Product\Repositories\Contracts\ProductImageRepositoryInterface;
 use App\Modules\Product\Repositories\Contracts\ProductRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -234,7 +235,7 @@ class ProductService
     public function deleteProductImage(int $imageId): bool
     {
         return DB::transaction(function () use ($imageId) {
-            $image = $this->imageRepository->getByProduct(0)->firstWhere('id', $imageId);
+            $image = ProductImage::find($imageId);
 
             if (! $image) {
                 throw new InvalidArgumentException("Image with ID {$imageId} not found");

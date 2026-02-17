@@ -24,7 +24,7 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
-
+        'role',
     ];
 
     /**
@@ -49,6 +49,30 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_admin' => 'boolean',
         ];
+    }
+
+    /**
+     * Check if user is an admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->is_admin || $this->role === 'admin';
+    }
+
+    /**
+     * Check if user has vendor role.
+     */
+    public function hasVendorRole(): bool
+    {
+        return $this->role === 'vendor';
+    }
+
+    /**
+     * Check if user is a customer.
+     */
+    public function isCustomer(): bool
+    {
+        return $this->role === 'customer';
     }
 
     /**
@@ -89,5 +113,53 @@ class User extends Authenticatable
     public function orders(): HasMany
     {
         return $this->hasMany(\App\Modules\Order\Models\Order::class);
+    }
+
+    /**
+     * Get the vendor account for this user.
+     */
+    public function vendor(): HasOne
+    {
+        return $this->hasOne(\App\Modules\Vendor\Models\Vendor::class);
+    }
+
+    /**
+     * Get the vendor application for this user.
+     */
+    public function vendorApplication(): HasOne
+    {
+        return $this->hasOne(\App\Modules\Vendor\Models\VendorApplication::class);
+    }
+
+    /**
+     * Check if user is a vendor.
+     */
+    public function isVendor(): bool
+    {
+        return $this->vendor()->exists();
+    }
+
+    /**
+     * Check if user has an approved vendor account.
+     */
+    public function isApprovedVendor(): bool
+    {
+        return $this->vendor()->where('status', 'approved')->exists();
+    }
+
+    /**
+     * Check if user has a pending vendor application.
+     */
+    public function hasPendingVendorApplication(): bool
+    {
+        return $this->vendorApplication()->where('status', 'pending')->exists();
+    }
+
+    /**
+     * Check if user has any vendor application.
+     */
+    public function hasVendorApplication(): bool
+    {
+        return $this->vendorApplication()->exists();
     }
 }

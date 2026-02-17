@@ -16,6 +16,8 @@ use App\Modules\User\Repositories\AddressRepository;
 use App\Modules\User\Repositories\Contracts\AddressRepositoryInterface;
 use App\Modules\User\Repositories\Contracts\ProfileRepositoryInterface;
 use App\Modules\User\Repositories\ProfileRepository;
+use App\Modules\Vendor\Repositories\Contracts\VendorRepositoryInterface;
+use App\Modules\Vendor\Repositories\VendorRepository;
 use Illuminate\Support\ServiceProvider;
 
 class ModuleServiceProvider extends ServiceProvider
@@ -39,6 +41,9 @@ class ModuleServiceProvider extends ServiceProvider
 
         // Register Cart module repositories
         $this->app->bind(CartRepositoryInterface::class, CartRepository::class);
+
+        // Register Vendor module repositories
+        $this->app->bind(VendorRepositoryInterface::class, VendorRepository::class);
     }
 
     /**

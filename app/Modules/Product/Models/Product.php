@@ -18,6 +18,7 @@ class Product extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'vendor_id',
         'category_id',
         'name',
         'slug',
@@ -56,6 +57,14 @@ class Product extends Model
             'is_featured' => 'boolean',
             'meta_data' => 'array',
         ];
+    }
+
+    /**
+     * Get the vendor this product belongs to.
+     */
+    public function vendor(): BelongsTo
+    {
+        return $this->belongsTo(\App\Modules\Vendor\Models\Vendor::class);
     }
 
     /**

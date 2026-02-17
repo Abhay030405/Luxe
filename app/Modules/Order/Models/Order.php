@@ -69,6 +69,14 @@ class Order extends Model
     }
 
     /**
+     * Get the vendor orders for this order.
+     */
+    public function vendorOrders(): HasMany
+    {
+        return $this->hasMany(VendorOrder::class);
+    }
+
+    /**
      * Scope to get orders for a specific user.
      */
     public function scopeForUser($query, int $userId)

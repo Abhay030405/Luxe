@@ -20,7 +20,7 @@ class ProductRepository implements ProductRepositoryInterface
      */
     public function all(): Collection
     {
-        return $this->model->with(['category', 'images'])->get();
+        return $this->model->with(['category', 'images', 'vendor'])->get();
     }
 
     /**
@@ -30,10 +30,16 @@ class ProductRepository implements ProductRepositoryInterface
      */
     public function getPaginated(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $query = $this->model->with(['category', 'images']);
+        $query = $this->model->with(['category', 'images', 'vendor']);
 
         // Temporary debug - will remove after testing
         logger('Repository applying filters:', $filters);
+
+        // Filter by vendor
+        if (! empty($filters['vendor_id'])) {
+            $query->where('vendor_id', $filters['vendor_id']);
+            logger('Applying vendor filter:', ['vendor_id' => $filters['vendor_id']]);
+        }
 
         // Filter by category
         if (! empty($filters['category_id'])) {
@@ -44,8 +50,9 @@ class ProductRepository implements ProductRepositoryInterface
         // Filter by status
         if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
-        } else {
-            $query->active(); // Default to active products
+        } elseif (empty($filters['vendor_id'])) {
+            // Default to active products only for public views (not vendor dashboard)
+            $query->active();
         }
 
         // Filter by price range
@@ -86,7 +93,7 @@ class ProductRepository implements ProductRepositoryInterface
      */
     public function findById(int $id): ?Product
     {
-        return $this->model->with(['category', 'images'])->find($id);
+        return $this->model->with(['category', 'images', 'vendor'])->find($id);
     }
 
     /**
@@ -94,7 +101,7 @@ class ProductRepository implements ProductRepositoryInterface
      */
     public function findBySlug(string $slug): ?Product
     {
-        return $this->model->where('slug', $slug)->with(['category', 'images'])->first();
+        return $this->model->where('slug', $slug)->with(['category', 'images', 'vendor'])->first();
     }
 
     /**
@@ -103,7 +110,7 @@ class ProductRepository implements ProductRepositoryInterface
     public function getByCategory(int $categoryId, int $perPage = 15): LengthAwarePaginator
     {
         return $this->model
-            ->with(['category', 'images'])
+            ->with(['category', 'images', 'vendor'])
             ->where('category_id', $categoryId)
             ->active()
             ->orderBy('created_at', 'desc')
@@ -116,7 +123,7 @@ class ProductRepository implements ProductRepositoryInterface
     public function getFeatured(int $limit = 8): Collection
     {
         return $this->model
-            ->with(['category', 'images'])
+            ->with(['category', 'images', 'vendor'])
             ->featured()
             ->active()
             ->inStock()
@@ -130,7 +137,7 @@ class ProductRepository implements ProductRepositoryInterface
     public function getLatest(int $limit = 8): Collection
     {
         return $this->model
-            ->with(['category', 'images'])
+            ->with(['category', 'images', 'vendor'])
             ->active()
             ->inStock()
             ->orderBy('created_at', 'desc')
@@ -187,7 +194,7 @@ class ProductRepository implements ProductRepositoryInterface
     public function search(string $keyword, int $perPage = 15): LengthAwarePaginator
     {
         return $this->model
-            ->with(['category', 'images'])
+            ->with(['category', 'images', 'vendor'])
             ->where(function ($query) use ($keyword) {
                 $query->where('name', 'like', "%{$keyword}%")
                     ->orWhere('description', 'like', "%{$keyword}%")

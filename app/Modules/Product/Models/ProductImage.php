@@ -22,6 +22,11 @@ class ProductImage extends Model
     ];
 
     /**
+     * Append accessors to array/JSON output.
+     */
+    protected $appends = ['image_url', 'url'];
+
+    /**
      * Create a new factory instance for the model.
      */
     protected static function newFactory(): ProductImageFactory
@@ -66,5 +71,21 @@ class ProductImage extends Model
         $productId = $this->product_id ?? rand(1, 1000);
 
         return "https://via.placeholder.com/640x640/4F46E5/FFFFFF?text=Product+{$productId}";
+    }
+
+    /**
+     * Accessor for image_url attribute.
+     */
+    public function getImageUrlAttribute(): string
+    {
+        return $this->getImageUrl();
+    }
+
+    /**
+     * Accessor for url attribute (alias for image_url).
+     */
+    public function getUrlAttribute(): string
+    {
+        return $this->getImageUrl();
     }
 }

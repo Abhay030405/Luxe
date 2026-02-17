@@ -155,13 +155,11 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex space-x-4 mb-6" x-data="{ 
-                inWishlist: {{ auth()->check() ? ($isInWishlist ? 'true' : 'false') : 'false' }}, 
-                loading: false 
-            }">
+            <div class="flex space-x-4 mb-6" 
+                 x-data="wishlistComponent({{ auth()->check() ? ($isInWishlist ? 'true' : 'false') : 'false' }})">
                 @auth
                     @if($product->isInStock)
-                    <button form="addToCartForm" type="submit" class="flex-1 inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition">
+                    <button form="addToCartForm" type="submit" class="flex-1 inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition cursor-pointer">
                         <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
                         </svg>
@@ -198,7 +196,18 @@
             </div>
 
             @if($product->isInStock)
-            <x-button variant="success" class="w-full" size="lg">Buy Now</x-button>
+            <form action="{{ route('cart.store') }}" method="POST" id="buyNowForm" x-data="{ submitting: false }" @submit="submitting = true">
+                @csrf
+                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                <input type="hidden" name="quantity" :value="document.getElementById('quantity').value">
+                <input type="hidden" name="buy_now" value="1">
+                <button type="submit" :disabled="submitting" class="w-full inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-600 disabled:opacity-50 cursor-pointer">
+                    <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                    </svg>
+                    <span x-text="submitting ? 'Processing...' : 'Buy Now'">Buy Now</span>
+                </button>
+            </form>
             @endif
 
             <script>
@@ -331,48 +340,56 @@
 
 @push('scripts')
 <script>
+    // Alpine.js Wishlist Component
+    function wishlistComponent(initialState) {
+        return {
+            inWishlist: initialState,
+            loading: false,
+            
+            toggleWishlist() {
+                this.loading = true;
+
+                fetch('{{ route('wishlist.toggle') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        product_id: {{ $product->id }}
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        this.inWishlist = !this.inWishlist;
+                        
+                        // Update wishlist counter in navigation
+                        updateWishlistCounter(data.count || 0);
+                        
+                        // Show notification with the actual message from the API
+                        showNotification(data.message || 'Wishlist updated successfully!', 'success');
+                    } else {
+                        showNotification(data.message || 'Something went wrong', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Failed to update wishlist', 'error');
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
+            }
+        }
+    }
+
     function changeMainImage(imageSrc) {
         const mainImage = document.getElementById('mainImage');
         if (mainImage) {
             mainImage.src = imageSrc;
         }
-    }
-
-    function toggleWishlist() {
-        this.loading = true;
-
-        fetch('{{ route('wishlist.toggle') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json',
-            },
-            body: JSON.stringify({
-                product_id: {{ $product->id }}
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                this.inWishlist = !this.inWishlist;
-                
-                // Update wishlist counter in navigation
-                updateWishlistCounter(data.count || 0);
-                
-                // Show notification with the actual message from the API
-                showNotification(data.message || 'Wishlist updated successfully!', 'success');
-            } else {
-                showNotification(data.message || 'Something went wrong', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showNotification('Failed to update wishlist', 'error');
-        })
-        .finally(() => {
-            this.loading = false;
-        });
     }
 
     function updateWishlistCounter(count) {

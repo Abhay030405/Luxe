@@ -24,18 +24,6 @@
         </div>
     </div>
 
-    @if(session('success'))
-        <div class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
-            {{ session('error') }}
-        </div>
-    @endif
-
     <div class="lg:grid lg:grid-cols-12 lg:gap-8">
         <!-- Main Content -->
         <div class="lg:col-span-8">
@@ -44,16 +32,18 @@
                 <div class="space-y-6">
                     @foreach($order->items as $item)
                         <div class="flex items-center space-x-4 pb-6 border-b border-gray-200 last:border-0 last:pb-0">
-                            <div class="h-24 w-24 flex-shrink-0 rounded-lg bg-gray-200 overflow-hidden">
-                                @if($item->product && $item->product->images->first())
+                            <div class="h-24 w-24 shrink-0 rounded-lg bg-gray-200 overflow-hidden">
+                                @if($item->product && $item->product->images && $item->product->images->count() > 0)
                                     <img 
                                         src="{{ $item->product->images->first()->image_url }}" 
                                         alt="{{ $item->product_name }}"
                                         class="w-full h-full object-cover"
                                     >
                                 @else
-                                    <div class="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
-                                        <span class="text-gray-400 text-sm font-medium">No Image</span>
+                                    <div class="w-full h-full bg-linear-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+                                        <svg class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                                        </svg>
                                     </div>
                                 @endif
                             </div>
@@ -172,7 +162,7 @@
             <x-card title="Order Status">
                 <div class="space-y-4">
                     <div class="flex items-start space-x-3">
-                        <div class="flex-shrink-0 w-2 h-2 mt-2 rounded-full {{ $order->status->isFinal() ? 'bg-green-500' : 'bg-blue-500' }}"></div>
+                        <div class="shrink-0 w-2 h-2 mt-2 rounded-full {{ $order->status->isFinal() ? 'bg-green-500' : 'bg-blue-500' }}"></div>
                         <div>
                             <p class="font-medium text-gray-900">{{ $order->status->label() }}</p>
                             <p class="text-sm text-gray-500">{{ $order->updated_at->format('M d, Y h:i A') }}</p>
