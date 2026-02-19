@@ -10,7 +10,7 @@
   </p>
 
   <p>
-    <strong>Live Demo:</strong> <i>Coming Soon</i>
+    <strong>Live Demo:</strong> https://johnedyran.com/<i>Coming Soon</i>
   </p>
 </div>
 
