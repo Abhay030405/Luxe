@@ -81,7 +81,7 @@ class OrderItem extends Model
      */
     public function getFormattedPriceAttribute(): string
     {
-        return '$'.number_format((float) $this->price, 2);
+        return '₹'.number_format((float) $this->price, 2);
     }
 
     /**
@@ -89,7 +89,7 @@ class OrderItem extends Model
      */
     public function getFormattedSubtotalAttribute(): string
     {
-        return '$'.number_format((float) $this->subtotal, 2);
+        return '₹'.number_format((float) $this->subtotal, 2);
     }
 
     /**

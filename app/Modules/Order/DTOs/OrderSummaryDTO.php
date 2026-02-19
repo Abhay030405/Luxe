@@ -87,7 +87,7 @@ readonly class OrderSummaryDTO
      */
     public function getFormattedSubtotal(): string
     {
-        return '$'.number_format((float) $this->subtotal, 2);
+        return '₹'.number_format((float) $this->subtotal, 2);
     }
 
     /**
@@ -95,7 +95,7 @@ readonly class OrderSummaryDTO
      */
     public function getFormattedTax(): string
     {
-        return '$'.number_format((float) $this->tax, 2);
+        return '₹'.number_format((float) $this->tax, 2);
     }
 
     /**
@@ -103,7 +103,7 @@ readonly class OrderSummaryDTO
      */
     public function getFormattedShippingFee(): string
     {
-        return '$'.number_format((float) $this->shippingFee, 2);
+        return '₹'.number_format((float) $this->shippingFee, 2);
     }
 
     /**
@@ -111,7 +111,7 @@ readonly class OrderSummaryDTO
      */
     public function getFormattedTotal(): string
     {
-        return '$'.number_format((float) $this->total, 2);
+        return '₹'.number_format((float) $this->total, 2);
     }
 
     /**

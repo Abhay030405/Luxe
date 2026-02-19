@@ -88,9 +88,9 @@
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900 font-semibold">${{ number_format($product->effectivePrice, 2) }}</div>
+                        <div class="text-sm text-gray-900 font-semibold">₹{{ number_format($product->effectivePrice, 2) }}</div>
                         @if($product->salePrice)
-                        <div class="text-sm text-gray-500 line-through">${{ number_format($product->price, 2) }}</div>
+                        <div class="text-sm text-gray-500 line-through">₹{{ number_format($product->price, 2) }}</div>
                         @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">

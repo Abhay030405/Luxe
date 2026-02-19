@@ -137,7 +137,7 @@
                     <div class="ml-4 sm:ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Total Earnings</dt>
-                            <dd class="text-2xl sm:text-3xl font-bold text-gray-900">${{ number_format($stats['total_earnings'] ?? 0, 2) }}</dd>
+                            <dd class="text-2xl sm:text-3xl font-bold text-gray-900">₹{{ number_format($stats['total_earnings'] ?? 0, 2) }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -171,7 +171,7 @@
                         @endif
                         <div class="ml-3 sm:ml-4 flex-1 min-w-0">
                             <p class="text-xs sm:text-sm font-medium text-gray-900 truncate">{{ $product->name }}</p>
-                            <p class="text-xs sm:text-sm text-gray-500">${{ number_format($product->price, 2) }}</p>
+                            <p class="text-xs sm:text-sm text-gray-500">₹{{ number_format($product->price, 2) }}</p>
                         </div>
                         <span class="inline-flex items-center px-2 py-0.5 sm:px-2.5 rounded-full text-xs font-medium {{ $product->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
                             {{ ucfirst($product->status) }}

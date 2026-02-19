@@ -69,14 +69,14 @@
                     <div class="p-6">
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-900 mb-2">Regular Price ($) <span class="text-red-500">*</span></label>
+                                <label class="block text-sm font-medium text-gray-900 mb-2">Regular Price (₹) <span class="text-red-500">*</span></label>
                                 <input type="number" step="0.01" name="price" placeholder="0.00" required class="w-full px-4 py-2.5 text-base rounded-lg border-2 border-gray-300 focus:border-slate-900 focus:ring-slate-900 @error('price') border-red-500 @enderror" value="{{ old('price') }}">
                                 @error('price')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-900 mb-2">Sale Price ($)</label>
+                                <label class="block text-sm font-medium text-gray-900 mb-2">Sale Price (₹)</label>
                                 <input type="number" step="0.01" name="sale_price" placeholder="0.00" class="w-full px-4 py-2.5 text-base rounded-lg border-2 border-gray-300 focus:border-slate-900 focus:ring-slate-900 @error('sale_price') border-red-500 @enderror" value="{{ old('sale_price') }}">
                                 <p class="mt-1 text-xs text-gray-500">Leave empty if not on sale</p>
                                 @error('sale_price')

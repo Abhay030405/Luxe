@@ -103,7 +103,7 @@
                                         Price <span class="text-red-500">*</span>
                                     </label>
                                     <div class="relative">
-                                        <span class="absolute left-4 top-2.5 text-gray-500">$</span>
+                                        <span class="absolute left-4 top-2.5 text-gray-500">₹</span>
                                         <input type="number" 
                                                name="price" 
                                                id="price" 
@@ -120,7 +120,7 @@
                                         Sale Price
                                     </label>
                                     <div class="relative">
-                                        <span class="absolute left-4 top-2.5 text-gray-500">$</span>
+                                        <span class="absolute left-4 top-2.5 text-gray-500">₹</span>
                                         <input type="number" 
                                                name="sale_price" 
                                                id="sale_price" 

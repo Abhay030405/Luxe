@@ -188,7 +188,7 @@ class VendorOrder extends Model
      */
     public function getFormattedSubtotalAttribute(): string
     {
-        return '$'.number_format((float) $this->subtotal, 2);
+        return '₹'.number_format((float) $this->subtotal, 2);
     }
 
     /**
@@ -196,7 +196,7 @@ class VendorOrder extends Model
      */
     public function getFormattedCommissionAttribute(): string
     {
-        return '$'.number_format((float) $this->commission_amount, 2);
+        return '₹'.number_format((float) $this->commission_amount, 2);
     }
 
     /**
@@ -204,7 +204,7 @@ class VendorOrder extends Model
      */
     public function getFormattedEarningsAttribute(): string
     {
-        return '$'.number_format((float) $this->vendor_earnings, 2);
+        return '₹'.number_format((float) $this->vendor_earnings, 2);
     }
 
     /**
